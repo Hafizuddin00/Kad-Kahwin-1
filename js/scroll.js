@@ -38,20 +38,7 @@ export function initScroll() {
   // ── Sticky header shadow effect (if a nav is ever added) ──────────────────
   // Smooth scroll polyfill for older browsers already handled by CSS scroll-behavior: smooth;
 
-  // ── Parallax (subtle) on hero ─────────────────────────────────────────────
-  const hero = document.getElementById('hero');
-  if (hero && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrolled = window.scrollY;
-          // Move background slower than foreground for parallax
-          hero.style.backgroundPositionY = `calc(50% + ${scrolled * 0.25}px)`;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
-  }
+  // ── Parallax on hero: use CSS background-attachment: fixed (same as countdown).
+  // JS parallax removed — CSS fixed attachment handles it natively and works
+  // consistently across devices without causing repaints on scroll.
 }

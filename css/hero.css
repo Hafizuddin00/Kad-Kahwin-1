@@ -10,13 +10,12 @@
   justify-content: center;
   overflow: hidden;
 
-  /* Fallback gradient — replaced by real bg via JS if image available */
+  /* Same overlay style as countdown section */
   background:
     linear-gradient(
       160deg,
-      rgba(15,10,5,0.72) 0%,
-      rgba(30,20,10,0.60) 50%,
-      rgba(15,10,5,0.75) 100%
+      rgba(15,10,5,0.80) 0%,
+      rgba(20,14,7,0.75) 100%
     ),
     url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80') center/cover no-repeat fixed;
 }
@@ -24,7 +23,7 @@
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.30) 100%);
+  background: radial-gradient(ellipse at center bottom, rgba(212,175,55,0.12) 0%, transparent 60%);
   pointer-events: none;
 }
 
