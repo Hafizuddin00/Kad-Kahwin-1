@@ -3,7 +3,7 @@
  */
 
 // ── Wedding date — update this! ───────────────────────────────────────────────
-const WEDDING_DATE = new Date('2025-09-20T10:00:00');
+const WEDDING_DATE = new Date('2027-01-24T10:00:00');
 
 export function initCountdown() {
   const elDays    = document.getElementById('cd-days');
