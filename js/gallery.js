@@ -671,15 +671,20 @@ export function initGallery() {
     if (Math.abs(dx) > 60) navigatePage(dx < 0 ? +1 : -1, grid, emptyEl);
   });
 
-  // Re-render on resize (page size may change between mobile/desktop)
+  // Re-render on resize only when page size (mobile/desktop breakpoint) actually changes
+  let lastPageSize = carouselState.pageSize();
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      carouselState.page = 0;
-      renderPage(grid, emptyEl);
-      updateCarouselControls();
-    }, 250);
+      const newPageSize = carouselState.pageSize();
+      if (newPageSize !== lastPageSize) {
+        lastPageSize = newPageSize;
+        carouselState.page = 0;
+        renderPage(grid, emptyEl);
+        updateCarouselControls();
+      }
+    }, 300);
   });
 
   let currentFilter = 'all';
