@@ -1,123 +1,117 @@
 <section id="gallery" class="gallery-section">
   <div class="section-wrapper">
     <div class="section-title reveal">
-      <span class="script-label">Our Story</span>
-      <h2>Photo Gallery</h2>
+      <span class="script-label">Kenangan Bersama</span>
+      <h2>Galeri Tetamu</h2>
       <div class="divider"><span class="divider-icon">✦</span></div>
     </div>
 
     <p class="gallery-desc reveal reveal-delay-1">
-      A glimpse into our journey — the moments that led us here.
+      Kongsi detik indah anda bersama kami.
     </p>
 
-    <!-- Filter tabs -->
-    <div class="gallery-filters reveal reveal-delay-2" role="group" aria-label="Gallery filter">
-      <button class="gallery-filter-btn active" data-filter="all">All</button>
-      <button class="gallery-filter-btn" data-filter="couple">Couple</button>
-      <button class="gallery-filter-btn" data-filter="nature">Venue</button>
-      <button class="gallery-filter-btn" data-filter="moments">Moments</button>
+    <!-- Upload trigger button -->
+    <div class="gallery-upload-trigger reveal reveal-delay-2">
+      <button class="btn btn-primary" id="gallery-upload-open-btn" aria-haspopup="dialog">
+        Kongsi Gambar Anda
+      </button>
     </div>
 
-    <!-- Grid -->
-    <div class="gallery-grid reveal reveal-delay-2" id="gallery-grid">
+    <!-- Upload Modal -->
+    <div id="gallery-upload-modal" class="gallery-modal" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title" hidden>
+      <div class="gallery-modal-backdrop" id="gallery-modal-backdrop"></div>
+      <div class="gallery-modal-box">
+        <button class="gallery-modal-close" id="gallery-modal-close" aria-label="Tutup">✕</button>
+        <h3 class="gallery-modal-title" id="gallery-modal-title">Kongsi Gambar</h3>
+        <p class="gallery-modal-sub">Detik anda akan diabadikan bersama kami.</p>
 
-      <figure class="gallery-item" data-category="couple" data-index="0">
-        <img
-          src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=75"
-          alt="Sarah and James at the park — couple portrait"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">First Date Anniversary</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+        <form id="gallery-upload-form" class="gallery-upload-form" novalidate aria-label="Photo upload form">
+          <div class="gallery-upload-fields">
+            <div class="gallery-upload-group">
+              <label for="upload-category">Kategori <span aria-label="required">*</span></label>
+              <select id="upload-category" name="category" required>
+                <option value="" disabled selected>-- Pilih kategori --</option>
+                <option value="pengantin">Pengantin</option>
+                <option value="tetamu">Tetamu</option>
+                <option value="majlis">Majlis</option>
+                <option value="makanan">Makanan</option>
+                <option value="lain">Lain-lain</option>
+              </select>
+              <span class="upload-error" id="upload-cat-err" role="alert"></span>
+            </div>
+          </div>
 
-      <figure class="gallery-item gallery-item-tall" data-category="couple" data-index="1">
-        <img
-          src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=75"
-          alt="Engagement photo — romantic evening"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">The Proposal</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+          <div class="gallery-upload-group">
+            <label for="upload-file">Pilih Gambar <span aria-label="required">*</span></label>
+            <div class="upload-drop-zone" id="upload-drop-zone" role="button" tabindex="0" aria-label="Drop image here or click to browse">
+              <input
+                type="file"
+                id="upload-file"
+                name="photo"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                required
+                aria-describedby="upload-file-hint"
+              />
+              <div class="upload-drop-inner" id="upload-drop-inner">
+                <span class="upload-drop-text">Seret gambar ke sini atau <u>klik untuk pilih</u></span>
+                <span class="upload-drop-hint" id="upload-file-hint">JPG, PNG, WEBP — maksimum 5 MB</span>
+              </div>
+              <div class="upload-preview-wrap hidden" id="upload-preview-wrap">
+                <img id="upload-preview-img" src="" alt="Preview" />
+                <button type="button" class="upload-preview-remove" id="upload-preview-remove" aria-label="Remove selected image">✕</button>
+              </div>
+            </div>
+            <span class="upload-error" id="upload-file-err" role="alert"></span>
+          </div>
 
-      <figure class="gallery-item" data-category="moments" data-index="2">
-        <img
-          src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=75"
-          alt="Wedding ring detail"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">The Rings</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+          <button type="submit" class="btn btn-primary gallery-upload-btn" id="gallery-upload-btn">
+            <span class="btn-text">Hantar Gambar</span>
+            <span class="btn-loading hidden" aria-hidden="true">Menghantar…</span>
+          </button>
 
-      <figure class="gallery-item gallery-item-wide" data-category="nature" data-index="3">
-        <img
-          src="https://images.unsplash.com/photo-1510076857177-7470076d4098?w=900&q=75"
-          alt="The venue — Grand Rosewood Estate garden"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">Our Venue</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+          <div class="gallery-upload-alert hidden" id="gallery-upload-alert" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
 
-      <figure class="gallery-item" data-category="moments" data-index="4">
-        <img
-          src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=75"
-          alt="Couple walking together — candid moment"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">A Walk to Remember</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+    <!-- Filter tabs -->
+    <div class="gallery-filters reveal reveal-delay-3" role="group" aria-label="Gallery filter">
+      <button class="gallery-filter-btn active" data-filter="all">Semua</button>
+      <button class="gallery-filter-btn" data-filter="pengantin">Pengantin</button>
+      <button class="gallery-filter-btn" data-filter="tetamu">Tetamu</button>
+      <button class="gallery-filter-btn" data-filter="majlis">Majlis</button>
+      <button class="gallery-filter-btn" data-filter="makanan">Makanan</button>
+      <button class="gallery-filter-btn" data-filter="lain">Lain-lain</button>
+    </div>
 
-      <figure class="gallery-item" data-category="couple" data-index="5">
-        <img
-          src="https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=75"
-          alt="Pre-wedding shoot — bride and groom"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">Pre-Wedding Shoot</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+    <!-- Loading skeleton -->
+    <div class="gallery-skeleton hidden" id="gallery-skeleton" aria-hidden="true">
+      <div class="gallery-skeleton-item"></div>
+      <div class="gallery-skeleton-item"></div>
+      <div class="gallery-skeleton-item"></div>
+      <div class="gallery-skeleton-item"></div>
+      <div class="gallery-skeleton-item"></div>
+      <div class="gallery-skeleton-item"></div>
+    </div>
 
-      <figure class="gallery-item" data-category="nature" data-index="6">
-        <img
-          src="https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=600&q=75"
-          alt="Venue flowers — wedding decoration"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">Floral Arrangements</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+    <!-- Grid — populated by JS -->
+    <div class="gallery-grid" id="gallery-grid" aria-live="polite" aria-label="Guest photo gallery">
+    </div>
 
-      <figure class="gallery-item gallery-item-tall" data-category="moments" data-index="7">
-        <img
-          src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&q=75"
-          alt="Romantic kiss — couple silhouette"
-          loading="lazy"
-        />
-        <figcaption class="gallery-caption">Forever Starts Now</figcaption>
-        <div class="gallery-overlay" aria-hidden="true">
-          <span class="gallery-zoom">🔍</span>
-        </div>
-      </figure>
+    <!-- Empty state -->
+    <div class="gallery-empty hidden" id="gallery-empty">
+      <p class="gallery-empty-icon" aria-hidden="true">🌸</p>
+      <p>Ruang galeri masih kosong. Sila kongsi gambar pertama anda!</p>
+    </div>
 
-    </div><!-- /.gallery-grid -->
+    <!-- Config notice -->
+    <div class="gallery-config-notice hidden" id="gallery-config-notice">
+      <p>
+        <strong>Developer Note:</strong>
+        Replace <code>GALLERY_SCRIPT_URL</code> in <code>js/gallery.js</code>
+        with your Google Apps Script Web App URL to enable live photo uploads.
+      </p>
+    </div>
 
   </div>
 

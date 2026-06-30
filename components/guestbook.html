@@ -1,13 +1,13 @@
 <section id="guestbook" class="guestbook-section">
   <div class="section-wrapper">
     <div class="section-title reveal">
-      <span class="script-label">Leave a Wish</span>
-      <h2>Guestbook</h2>
+      <span class="script-label">Tinggalkan Ucapan</span>
+      <h2>Tetamu</h2>
       <div class="divider"><span class="divider-icon">✦</span></div>
     </div>
 
     <p class="guestbook-desc reveal reveal-delay-1">
-      Write your heartfelt wishes for the happy couple. Your messages will be treasured forever.
+      Tuliskan ucapan ikhlas anda buat pasangan pengantin yang berbahagia. Ucapan anda akan dihargai selamanya.
     </p>
 
     <!-- Submit Form -->
@@ -15,12 +15,12 @@
       <form id="guestbook-form" class="guestbook-form" novalidate aria-label="Guestbook form">
         <div class="gb-form-row">
           <div class="gb-form-group">
-            <label for="gb-name">Your Name <span aria-label="required">*</span></label>
+            <label for="gb-name">Nama <span aria-label="required">*</span></label>
             <input
               type="text"
               id="gb-name"
               name="name"
-              placeholder="Enter your name"
+              placeholder="Ali bin Abu"
               required
               minlength="2"
               maxlength="80"
@@ -29,12 +29,12 @@
             <span class="gb-form-error" id="gb-name-err" role="alert"></span>
           </div>
           <div class="gb-form-group">
-            <label for="gb-message">Your Wish <span aria-label="required">*</span></label>
+            <label for="gb-message">Ucapan <span aria-label="required">*</span></label>
             <textarea
               id="gb-message"
               name="message"
               rows="3"
-              placeholder="Share your warmest wishes for Sarah &amp; James…"
+              placeholder="Titipkan ucapan ikhlas buat Dinie &amp; Fatihqa…"
               required
               minlength="5"
               maxlength="400"
@@ -47,8 +47,8 @@
         </div>
 
         <button type="submit" class="btn btn-primary gb-submit" id="gb-submit-btn">
-          <span class="gb-btn-text">✉ Send My Wish</span>
-          <span class="gb-btn-loading hidden" aria-hidden="true">Sending…</span>
+          <span class="gb-btn-text">✉ Hantarkan ucapan</span>
+          <span class="gb-btn-loading hidden" aria-hidden="true">Menghantar…</span>
         </button>
 
         <div class="gb-alert hidden" id="gb-alert" role="status" aria-live="polite"></div>
@@ -58,7 +58,7 @@
     <!-- Messages list -->
     <div class="guestbook-messages-header reveal reveal-delay-2">
       <h3 class="gb-messages-title">
-        <span id="gb-message-count">0</span> Wishes
+        <span id="gb-message-count">0</span> Ucapan
       </h3>
       <button class="gb-refresh-btn" id="gb-refresh-btn" aria-label="Refresh messages" title="Refresh">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -84,7 +84,7 @@
     <!-- Empty state -->
     <div class="gb-empty hidden" id="gb-empty">
       <p class="gb-empty-icon" aria-hidden="true">💌</p>
-      <p>Be the first to leave a wish!</p>
+      <p>Jadi yang pertaman meninggalkan ucapan!</p>
     </div>
 
     <!-- Config notice -->

@@ -72,7 +72,12 @@ function initRSVP() {
   document.querySelectorAll('input[name="attendance"]').forEach(radio => {
     radio.addEventListener('change', () => {
       const gc = document.getElementById('guest-count-group');
-      if (gc) gc.style.display = radio.value === 'no' ? 'none' : '';
+      const dg = document.getElementById('dietary-group');
+      const mg = document.getElementById('message-group');
+      const isNo = radio.value === 'no';
+      if (gc) gc.style.display = isNo ? 'none' : '';
+      if (dg) dg.style.display = isNo ? 'none' : '';
+      if (mg) mg.style.display = isNo ? 'none' : '';
     });
   });
 
@@ -131,6 +136,11 @@ function initRSVP() {
     submitBtn.querySelector('.btn-text')?.classList.remove('hidden');
     submitBtn.querySelector('.btn-loading')?.classList.add('hidden');
     if (charCount) charCount.textContent = '0 / 500';
+    // Restore hidden groups on reset
+    ['guest-count-group', 'dietary-group', 'message-group'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
   });
 }
 

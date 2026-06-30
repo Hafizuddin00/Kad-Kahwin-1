@@ -3,25 +3,25 @@
 
   <div class="section-wrapper">
     <div class="section-title reveal">
-      <span class="script-label">Join Us</span>
+      <span class="script-label">Undangan</span>
       <h2>RSVP</h2>
       <div class="divider"><span class="divider-icon">✦</span></div>
     </div>
 
     <p class="rsvp-deadline reveal reveal-delay-1">
-      Kindly respond by <strong>September 1, 2025</strong>
+      Sahkan kehadiran seebelum <strong>1 September 2026</strong>
     </p>
 
     <div class="rsvp-form-wrapper reveal reveal-delay-2">
       <form id="rsvp-form" class="rsvp-form" novalidate aria-label="RSVP form">
         <div class="form-row">
           <div class="form-group">
-            <label for="rsvp-name">Full Name <span aria-label="required">*</span></label>
+            <label for="rsvp-name">Nama Penuh <span aria-label="required">*</span></label>
             <input
               type="text"
               id="rsvp-name"
               name="name"
-              placeholder="Your full name"
+              placeholder="Ali bin Abu"
               required
               autocomplete="name"
               minlength="2"
@@ -30,35 +30,35 @@
             <span class="form-error" id="rsvp-name-err" role="alert"></span>
           </div>
           <div class="form-group">
-            <label for="rsvp-email">Email Address</label>
+            <label for="rsvp-phone">Nombor Telefon</label>
             <input
-              type="email"
-              id="rsvp-email"
-              name="email"
-              placeholder="your@email.com"
-              autocomplete="email"
-              maxlength="120"
+              type="text"
+              id="rsvp-phone"
+              name="phone"
+              placeholder="01X-XXXXXXXX"
+              autocomplete="tel"
+              maxlength="20"
             />
           </div>
         </div>
 
         <div class="form-group">
-          <label>Attendance <span aria-label="required">*</span></label>
+          <label>Kehadiran <span aria-label="required">*</span></label>
           <div class="rsvp-attendance" role="radiogroup" aria-required="true">
             <label class="rsvp-radio-label" for="att-yes">
               <input type="radio" id="att-yes" name="attendance" value="yes" required />
               <span class="radio-custom" aria-hidden="true"></span>
               <span>
-                <strong>Joyfully accepts</strong>
-                <em>I will be there!</em>
+                <strong>Dengan sukacitanya</strong>
+                <em>Saya akan hadir!</em>
               </span>
             </label>
             <label class="rsvp-radio-label" for="att-no">
               <input type="radio" id="att-no" name="attendance" value="no" required />
               <span class="radio-custom" aria-hidden="true"></span>
               <span>
-                <strong>Regretfully declines</strong>
-                <em>Unable to attend</em>
+                <strong>Dengan dukacitanya</strong>
+                <em>Tidak dapat hadir</em>
               </span>
             </label>
           </div>
@@ -66,16 +66,17 @@
         </div>
 
         <div class="form-group" id="guest-count-group">
-          <label for="rsvp-guests">Number of Guests (including yourself)</label>
+          <label for="rsvp-guests">Bilangan tetamu (including yourself)</label>
           <select id="rsvp-guests" name="guests">
-            <option value="1">1 Guest</option>
-            <option value="2">2 Guests</option>
-            <option value="3">3 Guests</option>
-            <option value="4">4 Guests</option>
-            <option value="5+">5+ Guests</option>
+            <option value="1">1 Orang</option>
+            <option value="2">2 Orang</option>
+            <option value="3">3 Orang</option>
+            <option value="4">4 Orang</option>
+            <option value="5+">5+ Orang</option>
           </select>
         </div>
 
+        <!--
         <div class="form-group">
           <label for="rsvp-events">Events Attending</label>
           <div class="rsvp-checkboxes">
@@ -96,9 +97,9 @@
             </label>
           </div>
         </div>
-
-        <div class="form-group">
-          <label for="rsvp-dietary">Dietary Requirements</label>
+      -->
+        <div class="form-group" id="dietary-group">
+          <label for="rsvp-dietary">Makanan Alergik</label>
           <input
             type="text"
             id="rsvp-dietary"
@@ -108,21 +109,21 @@
           />
         </div>
 
-        <div class="form-group">
-          <label for="rsvp-message">Personal Message</label>
+        <div class="form-group" id="message-group">
+          <label for="rsvp-message">Nota</label>
           <textarea
             id="rsvp-message"
             name="message"
             rows="4"
-            placeholder="Share a kind wish or message for the couple... (optional)"
+            placeholder="Nota tambahan... (optional)"
             maxlength="500"
           ></textarea>
           <span class="char-count" id="rsvp-msg-count">0 / 500</span>
         </div>
 
         <button type="submit" class="btn btn-primary rsvp-submit" id="rsvp-submit-btn">
-          <span class="btn-text">Send My RSVP</span>
-          <span class="btn-loading hidden" aria-hidden="true">Sending…</span>
+          <span class="btn-text">Hantar RSVP Saya</span>
+          <span class="btn-loading hidden" aria-hidden="true">Menghantar…</span>
         </button>
       </form>
 
