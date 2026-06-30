@@ -87,19 +87,20 @@ function renderPhotos(photos, grid, emptyEl, activeFilter) {
     ? photos
     : photos.filter(p => p.category === activeFilter);
 
-  // Always update the count regardless of whether we re-render
   const countEl = document.getElementById('gallery-photo-count');
-  if (countEl) countEl.textContent = filtered.length;
 
   // Skip full re-render if data hasn't changed
   const hash = activeFilter + '|' + filtered.map(p => (p.imageUrl || p.imageBase64 || '') + p.category).join('|');
   if (hash === _lastGalleryHash && carouselState.photos.length > 0) {
+    if (countEl) countEl.textContent = filtered.length;
     return;
   }
   _lastGalleryHash = hash;
 
   carouselState.photos = filtered;
   carouselState.page   = 0;
+
+  if (countEl) countEl.textContent = filtered.length;
 
   renderPage(grid, emptyEl);
   updateCarouselControls();
@@ -645,6 +646,7 @@ export function initGallery() {
   const nextBtn    = document.getElementById('gallery-next');
   const dotsWrap   = document.getElementById('gallery-dots');
   const refreshBtn = document.getElementById('gallery-refresh-btn');
+  const countEl    = document.getElementById('gallery-photo-count');
 
   if (!grid) return;
 
