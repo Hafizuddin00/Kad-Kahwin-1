@@ -79,27 +79,18 @@ const carouselState = {
   totalPages:  function() { return Math.ceil(this.photos.length / this.pageSize()) || 1; },
 };
 
-let _lastGalleryHash = '';
-
 // ─── Render grid (one page at a time) ────────────────────────────────────────
 function renderPhotos(photos, grid, emptyEl, activeFilter) {
+  // Store filtered photos in carousel state and reset to page 0
   const filtered = activeFilter === 'all'
     ? photos
     : photos.filter(p => p.category === activeFilter);
 
-  const countEl = document.getElementById('gallery-photo-count');
-
-  // Skip full re-render if data hasn't changed
-  const hash = activeFilter + '|' + filtered.map(p => (p.imageUrl || p.imageBase64 || '') + p.category).join('|');
-  if (hash === _lastGalleryHash && carouselState.photos.length > 0) {
-    if (countEl) countEl.textContent = filtered.length;
-    return;
-  }
-  _lastGalleryHash = hash;
-
   carouselState.photos = filtered;
   carouselState.page   = 0;
 
+  // Update count
+  const countEl = document.getElementById('gallery-photo-count');
   if (countEl) countEl.textContent = filtered.length;
 
   renderPage(grid, emptyEl);
