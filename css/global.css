@@ -1,0 +1,214 @@
+/* ===========================
+   GLOBAL CSS — Wedding Invite
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #fdfaf6;
+  --gold:      #d4af37;
+  --gold-dark: #b8962e;
+  --gold-light:#f0d97a;
+  --text:      #333;
+  --text-light:#666;
+  --white:     #fff;
+  --shadow:    rgba(0,0,0,0.10);
+  --radius:    12px;
+  --max-w:     1200px;
+  --section-pad: 90px 20px;
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-script:  'Great Vibes', cursive;
+  --font-body:    'Lato', sans-serif;
+  --transition:   0.35s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ---- Loading Screen ---- */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loader-inner { text-align: center; }
+.loader-names {
+  font-family: var(--font-script);
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  color: var(--gold);
+  margin-bottom: 18px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.loader-bar {
+  width: 180px;
+  height: 3px;
+  background: #e8dfc8;
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.loader-bar span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  border-radius: 99px;
+  animation: loading-bar 1.8s ease-in-out infinite;
+}
+@keyframes loading-bar {
+  0%   { width: 0; margin-left: 0; }
+  50%  { width: 60%; margin-left: 20%; }
+  100% { width: 0; margin-left: 100%; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* ---- Scroll Reveal ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-delay-1 { transition-delay: 0.10s; }
+.reveal-delay-2 { transition-delay: 0.22s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+.reveal-delay-4 { transition-delay: 0.50s; }
+
+/* ---- Section Wrapper ---- */
+.section-wrapper {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--section-pad);
+  width: 100%;
+}
+
+/* ---- Section Title ---- */
+.section-title {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.section-title .script-label {
+  display: block;
+  font-family: var(--font-script);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.section-title h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.section-title .divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+.section-title .divider::before,
+.section-title .divider::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+.section-title .divider-icon {
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-block;
+  padding: 13px 36px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--white);
+  border-color: var(--gold);
+}
+.btn-primary:hover {
+  background: var(--gold-dark);
+  border-color: var(--gold-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(212,175,55,0.35);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.btn-outline:hover {
+  background: var(--gold);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* ---- Ornament / Separator ---- */
+.ornament {
+  text-align: center;
+  margin: 8px 0;
+  font-size: 1.3rem;
+  color: var(--gold);
+  opacity: 0.7;
+  letter-spacing: 0.3em;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 99px; }
+
+/* ---- Selection ---- */
+::selection { background: var(--gold-light); color: var(--text); }
+
+/* ---- Responsive helpers ---- */
+@media (max-width: 768px) {
+  :root { --section-pad: 60px 18px; }
+  .section-title { margin-bottom: 36px; }
+}

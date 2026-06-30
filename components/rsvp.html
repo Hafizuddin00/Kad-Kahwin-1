@@ -1,0 +1,139 @@
+<section id="rsvp" class="rsvp-section">
+  <div class="rsvp-bg-overlay" aria-hidden="true"></div>
+
+  <div class="section-wrapper">
+    <div class="section-title reveal">
+      <span class="script-label">Join Us</span>
+      <h2>RSVP</h2>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </div>
+
+    <p class="rsvp-deadline reveal reveal-delay-1">
+      Kindly respond by <strong>September 1, 2025</strong>
+    </p>
+
+    <div class="rsvp-form-wrapper reveal reveal-delay-2">
+      <form id="rsvp-form" class="rsvp-form" novalidate aria-label="RSVP form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="rsvp-name">Full Name <span aria-label="required">*</span></label>
+            <input
+              type="text"
+              id="rsvp-name"
+              name="name"
+              placeholder="Your full name"
+              required
+              autocomplete="name"
+              minlength="2"
+              maxlength="80"
+            />
+            <span class="form-error" id="rsvp-name-err" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="rsvp-email">Email Address</label>
+            <input
+              type="email"
+              id="rsvp-email"
+              name="email"
+              placeholder="your@email.com"
+              autocomplete="email"
+              maxlength="120"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Attendance <span aria-label="required">*</span></label>
+          <div class="rsvp-attendance" role="radiogroup" aria-required="true">
+            <label class="rsvp-radio-label" for="att-yes">
+              <input type="radio" id="att-yes" name="attendance" value="yes" required />
+              <span class="radio-custom" aria-hidden="true"></span>
+              <span>
+                <strong>Joyfully accepts</strong>
+                <em>I will be there!</em>
+              </span>
+            </label>
+            <label class="rsvp-radio-label" for="att-no">
+              <input type="radio" id="att-no" name="attendance" value="no" required />
+              <span class="radio-custom" aria-hidden="true"></span>
+              <span>
+                <strong>Regretfully declines</strong>
+                <em>Unable to attend</em>
+              </span>
+            </label>
+          </div>
+          <span class="form-error" id="rsvp-att-err" role="alert"></span>
+        </div>
+
+        <div class="form-group" id="guest-count-group">
+          <label for="rsvp-guests">Number of Guests (including yourself)</label>
+          <select id="rsvp-guests" name="guests">
+            <option value="1">1 Guest</option>
+            <option value="2">2 Guests</option>
+            <option value="3">3 Guests</option>
+            <option value="4">4 Guests</option>
+            <option value="5+">5+ Guests</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="rsvp-events">Events Attending</label>
+          <div class="rsvp-checkboxes">
+            <label class="rsvp-check-label" for="ev-ceremony">
+              <input type="checkbox" id="ev-ceremony" name="events" value="ceremony" checked />
+              <span class="check-custom" aria-hidden="true"></span>
+              Holy Matrimony (10:00 AM)
+            </label>
+            <label class="rsvp-check-label" for="ev-reception">
+              <input type="checkbox" id="ev-reception" name="events" value="reception" checked />
+              <span class="check-custom" aria-hidden="true"></span>
+              Wedding Reception (2:00 PM)
+            </label>
+            <label class="rsvp-check-label" for="ev-party">
+              <input type="checkbox" id="ev-party" name="events" value="afterparty" />
+              <span class="check-custom" aria-hidden="true"></span>
+              After Party (10:00 PM)
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rsvp-dietary">Dietary Requirements</label>
+          <input
+            type="text"
+            id="rsvp-dietary"
+            name="dietary"
+            placeholder="Vegetarian, vegan, allergies, etc. (optional)"
+            maxlength="200"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="rsvp-message">Personal Message</label>
+          <textarea
+            id="rsvp-message"
+            name="message"
+            rows="4"
+            placeholder="Share a kind wish or message for the couple... (optional)"
+            maxlength="500"
+          ></textarea>
+          <span class="char-count" id="rsvp-msg-count">0 / 500</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary rsvp-submit" id="rsvp-submit-btn">
+          <span class="btn-text">Send My RSVP</span>
+          <span class="btn-loading hidden" aria-hidden="true">Sending…</span>
+        </button>
+      </form>
+
+      <!-- Success Message -->
+      <div class="rsvp-success hidden" id="rsvp-success" role="status" aria-live="polite">
+        <div class="rsvp-success-icon" aria-hidden="true">💌</div>
+        <h3>Thank You!</h3>
+        <p id="rsvp-success-msg">We've received your RSVP and can't wait to celebrate with you!</p>
+        <button class="btn btn-outline rsvp-reset-btn" id="rsvp-reset-btn" type="button">Submit Another RSVP</button>
+      </div>
+
+    </div><!-- /.rsvp-form-wrapper -->
+  </div>
+</section>

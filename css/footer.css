@@ -1,0 +1,197 @@
+/* ===========================
+   FOOTER SECTION
+   =========================== */
+
+.footer-section {
+  position: relative;
+  background:
+    linear-gradient(
+      175deg,
+      rgba(10,7,3,0.92) 0%,
+      rgba(5,3,1,0.96) 100%
+    ),
+    url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=60') center/cover no-repeat;
+  color: var(--white);
+  text-align: center;
+  overflow: hidden;
+}
+.footer-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center top, rgba(212,175,55,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ---- Top Ornament ---- */
+.footer-ornament {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 40px;
+  margin-bottom: 0;
+  opacity: 0.35;
+}
+.footer-ornament span:not(.footer-ornament-icon) {
+  flex: 1;
+  height: 1px;
+  background: var(--gold);
+}
+.footer-ornament-icon { color: var(--gold); font-size: 1.4rem; }
+
+/* ---- Wrapper ---- */
+.footer-wrapper {
+  padding-top: 60px;
+  padding-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ---- Names ---- */
+.footer-names {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  line-height: 1;
+}
+.footer-name {
+  font-family: var(--font-script);
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  color: var(--white);
+}
+.footer-ampersand {
+  font-family: var(--font-script);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--gold-light);
+  padding-bottom: 8px;
+}
+
+/* ---- Date ---- */
+.footer-date {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-top: -6px;
+}
+
+/* ---- Message ---- */
+.footer-message {
+  font-size: clamp(0.88rem, 2vw, 1rem);
+  color: rgba(255,255,255,0.65);
+  font-style: italic;
+  line-height: 1.8;
+  max-width: 480px;
+}
+
+/* ---- Divider ---- */
+.footer-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 200px;
+}
+.footer-divider span:not(.footer-heart) {
+  flex: 1;
+  height: 1px;
+  background: rgba(212,175,55,0.35);
+}
+.footer-heart {
+  color: var(--gold);
+  font-size: 1.1rem;
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+/* ---- Nav ---- */
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  justify-content: center;
+}
+.footer-nav a {
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color var(--transition);
+}
+.footer-nav a:hover { color: var(--gold-light); }
+
+/* ---- Social ---- */
+.footer-social {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.footer-social-link {
+  width: 38px; height: 38px;
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.6);
+  transition: all var(--transition);
+}
+.footer-social-link:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+.footer-social-link svg { width: 15px; height: 15px; }
+
+/* ---- Hashtag ---- */
+.footer-hashtag {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold-light);
+  opacity: 0.8;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Copyright ---- */
+.footer-copy {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.06em;
+}
+.footer-copy span { color: #e57373; }
+
+/* ---- Back to Top ---- */
+.back-to-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 44px; height: 44px;
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212,175,55,0.4);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: all var(--transition);
+  z-index: 99;
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.back-to-top:hover {
+  background: var(--gold-dark);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .footer-names { gap: 8px; }
+}

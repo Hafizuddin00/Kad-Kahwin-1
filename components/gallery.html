@@ -1,0 +1,136 @@
+<section id="gallery" class="gallery-section">
+  <div class="section-wrapper">
+    <div class="section-title reveal">
+      <span class="script-label">Our Story</span>
+      <h2>Photo Gallery</h2>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </div>
+
+    <p class="gallery-desc reveal reveal-delay-1">
+      A glimpse into our journey — the moments that led us here.
+    </p>
+
+    <!-- Filter tabs -->
+    <div class="gallery-filters reveal reveal-delay-2" role="group" aria-label="Gallery filter">
+      <button class="gallery-filter-btn active" data-filter="all">All</button>
+      <button class="gallery-filter-btn" data-filter="couple">Couple</button>
+      <button class="gallery-filter-btn" data-filter="nature">Venue</button>
+      <button class="gallery-filter-btn" data-filter="moments">Moments</button>
+    </div>
+
+    <!-- Grid -->
+    <div class="gallery-grid reveal reveal-delay-2" id="gallery-grid">
+
+      <figure class="gallery-item" data-category="couple" data-index="0">
+        <img
+          src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=75"
+          alt="Sarah and James at the park — couple portrait"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">First Date Anniversary</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item gallery-item-tall" data-category="couple" data-index="1">
+        <img
+          src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=75"
+          alt="Engagement photo — romantic evening"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">The Proposal</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item" data-category="moments" data-index="2">
+        <img
+          src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=75"
+          alt="Wedding ring detail"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">The Rings</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item gallery-item-wide" data-category="nature" data-index="3">
+        <img
+          src="https://images.unsplash.com/photo-1510076857177-7470076d4098?w=900&q=75"
+          alt="The venue — Grand Rosewood Estate garden"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">Our Venue</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item" data-category="moments" data-index="4">
+        <img
+          src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=75"
+          alt="Couple walking together — candid moment"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">A Walk to Remember</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item" data-category="couple" data-index="5">
+        <img
+          src="https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=75"
+          alt="Pre-wedding shoot — bride and groom"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">Pre-Wedding Shoot</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item" data-category="nature" data-index="6">
+        <img
+          src="https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=600&q=75"
+          alt="Venue flowers — wedding decoration"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">Floral Arrangements</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+      <figure class="gallery-item gallery-item-tall" data-category="moments" data-index="7">
+        <img
+          src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&q=75"
+          alt="Romantic kiss — couple silhouette"
+          loading="lazy"
+        />
+        <figcaption class="gallery-caption">Forever Starts Now</figcaption>
+        <div class="gallery-overlay" aria-hidden="true">
+          <span class="gallery-zoom">🔍</span>
+        </div>
+      </figure>
+
+    </div><!-- /.gallery-grid -->
+
+  </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+    <button class="lightbox-close" id="lb-close" aria-label="Close lightbox">✕</button>
+    <button class="lightbox-prev" id="lb-prev" aria-label="Previous image">&#8249;</button>
+    <button class="lightbox-next" id="lb-next" aria-label="Next image">&#8250;</button>
+    <div class="lightbox-inner">
+      <img id="lb-img" src="" alt="" />
+      <p id="lb-caption" class="lightbox-caption"></p>
+    </div>
+    <div class="lightbox-backdrop" id="lb-backdrop"></div>
+  </div>
+
+</section>

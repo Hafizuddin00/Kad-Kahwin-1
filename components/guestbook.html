@@ -1,0 +1,101 @@
+<section id="guestbook" class="guestbook-section">
+  <div class="section-wrapper">
+    <div class="section-title reveal">
+      <span class="script-label">Leave a Wish</span>
+      <h2>Guestbook</h2>
+      <div class="divider"><span class="divider-icon">✦</span></div>
+    </div>
+
+    <p class="guestbook-desc reveal reveal-delay-1">
+      Write your heartfelt wishes for the happy couple. Your messages will be treasured forever.
+    </p>
+
+    <!-- Submit Form -->
+    <div class="guestbook-form-wrapper reveal reveal-delay-2">
+      <form id="guestbook-form" class="guestbook-form" novalidate aria-label="Guestbook form">
+        <div class="gb-form-row">
+          <div class="gb-form-group">
+            <label for="gb-name">Your Name <span aria-label="required">*</span></label>
+            <input
+              type="text"
+              id="gb-name"
+              name="name"
+              placeholder="Enter your name"
+              required
+              minlength="2"
+              maxlength="80"
+              autocomplete="name"
+            />
+            <span class="gb-form-error" id="gb-name-err" role="alert"></span>
+          </div>
+          <div class="gb-form-group">
+            <label for="gb-message">Your Wish <span aria-label="required">*</span></label>
+            <textarea
+              id="gb-message"
+              name="message"
+              rows="3"
+              placeholder="Share your warmest wishes for Sarah &amp; James…"
+              required
+              minlength="5"
+              maxlength="400"
+            ></textarea>
+            <div class="gb-form-footer">
+              <span class="gb-form-error" id="gb-msg-err" role="alert"></span>
+              <span class="gb-char-count" id="gb-char-count">0 / 400</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary gb-submit" id="gb-submit-btn">
+          <span class="gb-btn-text">✉ Send My Wish</span>
+          <span class="gb-btn-loading hidden" aria-hidden="true">Sending…</span>
+        </button>
+
+        <div class="gb-alert hidden" id="gb-alert" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <!-- Messages list -->
+    <div class="guestbook-messages-header reveal reveal-delay-2">
+      <h3 class="gb-messages-title">
+        <span id="gb-message-count">0</span> Wishes
+      </h3>
+      <button class="gb-refresh-btn" id="gb-refresh-btn" aria-label="Refresh messages" title="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div class="gb-skeleton hidden" id="gb-skeleton" aria-hidden="true">
+      <div class="gb-skeleton-card"></div>
+      <div class="gb-skeleton-card"></div>
+      <div class="gb-skeleton-card"></div>
+    </div>
+
+    <!-- Messages Grid -->
+    <div class="guestbook-grid" id="guestbook-grid" aria-live="polite" aria-label="Guest wishes">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div class="gb-empty hidden" id="gb-empty">
+      <p class="gb-empty-icon" aria-hidden="true">💌</p>
+      <p>Be the first to leave a wish!</p>
+    </div>
+
+    <!-- Config notice -->
+    <div class="gb-config-notice hidden" id="gb-config-notice">
+      <p>
+        <strong>Developer Note:</strong>
+        To enable the live guestbook, replace <code>GOOGLE_SCRIPT_URL</code> in <code>js/guestbook.js</code>
+        with your Google Apps Script Web App URL.
+        <a href="#" onclick="return false">View setup guide ↗</a>
+      </p>
+    </div>
+
+  </div>
+</section>

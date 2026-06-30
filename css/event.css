@@ -1,0 +1,188 @@
+/* ===========================
+   EVENT DETAILS SECTION
+   =========================== */
+
+.event-section {
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.event-section::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(500px, 90vw);
+  height: min(500px, 90vw);
+  background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.event-intro {
+  text-align: center;
+  max-width: 600px;
+  margin: -20px auto 52px;
+  font-size: 1.05rem;
+  color: var(--text-light);
+  font-style: italic;
+  line-height: 1.8;
+}
+
+/* ---- Cards Grid ---- */
+.event-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  max-width: 1060px;
+  margin: 0 auto 56px;
+}
+
+/* ---- Single Card ---- */
+.event-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px 28px 32px;
+  text-align: center;
+  box-shadow: 0 4px 28px var(--shadow);
+  border: 1px solid rgba(212,175,55,0.12);
+  position: relative;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.event-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 42px rgba(212,175,55,0.18);
+}
+
+.event-card-featured {
+  background: linear-gradient(145deg, #fffbf0 0%, #fff8e0 100%);
+  border-color: rgba(212,175,55,0.35);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 46px rgba(212,175,55,0.22);
+}
+.event-card-featured:hover {
+  transform: translateY(-14px);
+}
+
+.event-card-ribbon {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(212,175,55,0.4);
+}
+
+.event-card-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  color: var(--gold);
+  background: rgba(212,175,55,0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.event-card-icon svg { width: 100%; height: 100%; }
+
+.event-card-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  padding: 3px 14px;
+  margin-bottom: 10px;
+}
+.event-card-badge-gold {
+  color: var(--gold-dark);
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.06);
+}
+
+.event-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+/* ---- Info List ---- */
+.event-info-list {
+  list-style: none;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.event-info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+.event-info-list strong { color: var(--text); }
+.ei-icon { font-size: 1rem; flex-shrink: 0; padding-top: 1px; }
+
+.event-rsvp-btn {
+  width: 100%;
+  text-align: center;
+  font-size: 0.82rem;
+}
+
+/* ---- Quote ---- */
+.event-quote {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 32px;
+  border-left: none;
+  position: relative;
+}
+.event-quote::before,
+.event-quote::after {
+  font-family: var(--font-script);
+  font-size: 4rem;
+  color: var(--gold);
+  opacity: 0.25;
+  line-height: 0;
+  position: absolute;
+}
+.event-quote::before {
+  content: '\201C';
+  top: 28px;
+  left: 0;
+}
+.event-quote::after {
+  content: '\201D';
+  bottom: 6px;
+  right: 0;
+}
+.event-quote p {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.18rem);
+  color: var(--text-light);
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .event-card-featured { transform: none; }
+  .event-card-featured:hover { transform: translateY(-6px); }
+}
