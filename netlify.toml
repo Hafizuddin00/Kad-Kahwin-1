@@ -5,14 +5,16 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options      = "DENY"
-    X-XSS-Protection     = "1; mode=block"
+    X-Frame-Options        = "DENY"
+    X-XSS-Protection       = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy      = "strict-origin-when-cross-origin"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
 
+# Serve JS files with correct MIME type so ES modules work
 [[headers]]
-  for = "/js/*"
+  for = "/js/*.js"
   [headers.values]
+    Content-Type  = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=3600"
 
 [[headers]]
@@ -24,3 +26,10 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# Allow fetch() to load HTML components
+[[headers]]
+  for = "/components/*.html"
+  [headers.values]
+    Content-Type  = "text/html; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
