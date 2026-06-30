@@ -89,6 +89,10 @@ function renderPhotos(photos, grid, emptyEl, activeFilter) {
   carouselState.photos = filtered;
   carouselState.page   = 0;
 
+  // Update count
+  const countEl = document.getElementById('gallery-photo-count');
+  if (countEl) countEl.textContent = filtered.length;
+
   renderPage(grid, emptyEl);
   updateCarouselControls();
 }
@@ -632,6 +636,8 @@ export function initGallery() {
   const prevBtn    = document.getElementById('gallery-prev');
   const nextBtn    = document.getElementById('gallery-next');
   const dotsWrap   = document.getElementById('gallery-dots');
+  const refreshBtn = document.getElementById('gallery-refresh-btn');
+  const countEl    = document.getElementById('gallery-photo-count');
 
   if (!grid) return;
 
@@ -696,6 +702,11 @@ export function initGallery() {
   initFilters((filter) => {
     currentFilter = filter;
     renderPhotos(allPhotos, grid, emptyEl, currentFilter);
+  });
+
+  refreshBtn?.addEventListener('click', () => {
+    refreshBtn.classList.add('spinning');
+    refresh().finally(() => setTimeout(() => refreshBtn.classList.remove('spinning'), 600));
   });
 
   initUploadModal();

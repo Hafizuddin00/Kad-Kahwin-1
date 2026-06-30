@@ -8,8 +8,6 @@
 import { SCRIPT_URL } from './config.js';
 const GOOGLE_SCRIPT_URL = SCRIPT_URL;
 
-const AUTO_REFRESH_INTERVAL = 10_000; // 10 seconds
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function escapeHtml(str) {
   return String(str)
@@ -189,12 +187,7 @@ export function initGuestbook() {
   // Initial fetch
   fetchMessages(grid, countEl, emptyEl, skeletonEl);
 
-  // Auto refresh
-  setInterval(() => {
-    fetchMessages(grid, countEl, emptyEl, null);
-  }, AUTO_REFRESH_INTERVAL);
-
-  // Manual refresh
+  // Manual refresh only
   refreshBtn?.addEventListener('click', () => {
     refreshBtn.classList.add('spinning');
     fetchMessages(grid, countEl, emptyEl, null)
