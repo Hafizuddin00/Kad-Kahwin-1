@@ -1,52 +1,12 @@
 /**
  * guestbook.js — Live guestbook powered by Google Apps Script / Google Sheets
  *
- * ─── SETUP GUIDE ─────────────────────────────────────────────────────────────
- *
- * 1. Create a new Google Sheet with columns:
- *    A: Timestamp  |  B: Name  |  C: Message
- *
- * 2. Open Extensions → Apps Script and paste the following server-side code:
- *
- * ┌─────────────────────────────────────────────────────────────────────────┐
- * │  function doPost(e) {                                                   │
- * │    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();│
- * │    const data  = JSON.parse(e.postData.contents);                       │
- * │    sheet.appendRow([                                                     │
- * │      new Date().toISOString(),                                           │
- * │      data.name,                                                          │
- * │      data.message                                                        │
- * │    ]);                                                                   │
- * │    return ContentService                                                 │
- * │      .createTextOutput(JSON.stringify({ status: 'ok' }))                │
- * │      .setMimeType(ContentService.MimeType.JSON);                         │
- * │  }                                                                       │
- * │                                                                          │
- * │  function doGet(e) {                                                     │
- * │    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();│
- * │    const rows  = sheet.getDataRange().getValues();                       │
- * │    const messages = rows.slice(1).map(row => ({                          │
- * │      time:    row[0],                                                    │
- * │      name:    row[1],                                                    │
- * │      message: row[2]                                                     │
- * │    })).reverse();                                                        │
- * │    return ContentService                                                 │
- * │      .createTextOutput(JSON.stringify(messages))                         │
- * │      .setMimeType(ContentService.MimeType.JSON);                         │
- * │  }                                                                       │
- * └─────────────────────────────────────────────────────────────────────────┘
- *
- * 3. Deploy → New deployment → Type: Web App
- *    - Execute as: Me
- *    - Who has access: Anyone
- *    - Copy the Web App URL
- *
- * 4. Replace the empty string below with that URL:
- *
- * ─────────────────────────────────────────────────────────────────────────────
+ * Uses a SHARED workbook with RSVP and Gallery.
+ * Configure the URL once in js/config.js.
  */
 
-const GOOGLE_SCRIPT_URL = ''; // ← Paste your Web App URL here
+import { SCRIPT_URL } from './config.js';
+const GOOGLE_SCRIPT_URL = SCRIPT_URL;
 
 const AUTO_REFRESH_INTERVAL = 10_000; // 10 seconds
 
@@ -124,7 +84,7 @@ async function fetchMessages(grid, countEl, emptyEl, skeletonEl) {
 
   try {
     // Cache-bust with timestamp to avoid stale responses
-    const url  = `${GOOGLE_SCRIPT_URL}?t=${Date.now()}`;
+    const url  = `${GOOGLE_SCRIPT_URL}?action=guestbook&t=${Date.now()}`;
     const res  = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -149,10 +109,11 @@ async function submitMessage({ name, message }, alertEl, btnEl, btnText, btnLoad
   try {
     const res = await fetch(GOOGLE_SCRIPT_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ name, message }),
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify({ action: 'guestbook', name, message }),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // no-cors returns opaque response — can't read res.ok, assume success if no throw
 
     showAlert(alertEl, 'Your wish has been sent! 💌', 'success');
     return true;

@@ -1,56 +1,18 @@
 /**
- * gallery.js — Guest photo gallery with category filter + upload to Google Sheets
+ * gallery.js — Guest photo gallery with category filter + upload
  *
- * ─── SETUP GUIDE ─────────────────────────────────────────────────────────────
+ * Upload flow:
+ *   1. Resize image client-side
+ *   2. Upload to ImgBB (free image host) → get a permanent URL
+ *   3. POST { action:'gallery', category, imageUrl } to Apps Script
+ *   4. Apps Script saves a row to the Gallery sheet
+ *   5. Gallery fetches rows and renders using imageUrl
  *
- * 1. Create a new Google Sheet with columns:
- *    A: Timestamp | B: Uploader | C: Category | D: Caption | E: ImageBase64
- *
- * 2. Open Extensions → Apps Script and paste:
- *
- * ┌─────────────────────────────────────────────────────────────────────────┐
- * │  function doPost(e) {                                                   │
- * │    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();│
- * │    const data  = JSON.parse(e.postData.contents);                       │
- * │    sheet.appendRow([                                                     │
- * │      new Date().toISOString(),                                           │
- * │      data.uploader,                                                      │
- * │      data.category,                                                      │
- * │      data.caption,                                                       │
- * │      data.imageBase64                                                    │
- * │    ]);                                                                   │
- * │    return ContentService                                                 │
- * │      .createTextOutput(JSON.stringify({ status: 'ok' }))                │
- * │      .setMimeType(ContentService.MimeType.JSON);                         │
- * │  }                                                                       │
- * │                                                                          │
- * │  function doGet(e) {                                                     │
- * │    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();│
- * │    const rows  = sheet.getDataRange().getValues();                       │
- * │    const photos = rows.slice(1).map(row => ({                            │
- * │      time:        row[0],                                                │
- * │      uploader:    row[1],                                                │
- * │      category:    row[2],                                                │
- * │      caption:     row[3],                                                │
- * │      imageBase64: row[4]                                                 │
- * │    })).reverse();                                                        │
- * │    return ContentService                                                 │
- * │      .createTextOutput(JSON.stringify(photos))                           │
- * │      .setMimeType(ContentService.MimeType.JSON);                         │
- * │  }                                                                       │
- * └─────────────────────────────────────────────────────────────────────────┘
- *
- * 3. Deploy → New deployment → Type: Web App
- *    - Execute as: Me
- *    - Who has access: Anyone
- *    - Copy the Web App URL
- *
- * 4. Replace the empty string below with that URL:
- *
- * ─────────────────────────────────────────────────────────────────────────────
+ * Configure both keys in js/config.js.
  */
 
-const GALLERY_SCRIPT_URL = ''; // ← Paste your Web App URL here
+import { SCRIPT_URL, IMGBB_KEY } from './config.js';
+const GALLERY_SCRIPT_URL = SCRIPT_URL;
 
 const MAX_FILE_BYTES  = 5 * 1024 * 1024; // 5 MB
 const MAX_IMG_DIM     = 1200;             // resize longest edge to this before upload
@@ -109,42 +71,118 @@ function showUploadAlert(el, msg, type) {
   setTimeout(() => el.classList.add('hidden'), 6000);
 }
 
-// ─── Render grid ─────────────────────────────────────────────────────────────
-function renderPhotos(photos, grid, emptyEl, activeFilter) {
-  grid.innerHTML = '';
+// ─── Carousel state ───────────────────────────────────────────────────────────
+const carouselState = {
+  photos:      [],  // full filtered list
+  page:        0,
+  pageSize:    () => window.innerWidth <= 768 ? 6 : 8,
+  totalPages:  function() { return Math.ceil(this.photos.length / this.pageSize()) || 1; },
+};
 
+// ─── Render grid (one page at a time) ────────────────────────────────────────
+function renderPhotos(photos, grid, emptyEl, activeFilter) {
+  // Store filtered photos in carousel state and reset to page 0
   const filtered = activeFilter === 'all'
     ? photos
     : photos.filter(p => p.category === activeFilter);
 
-  if (!filtered.length) {
+  carouselState.photos = filtered;
+  carouselState.page   = 0;
+
+  renderPage(grid, emptyEl);
+  updateCarouselControls();
+}
+
+function renderPage(grid, emptyEl) {
+  grid.innerHTML = '';
+
+  const { photos, page } = carouselState;
+  const ps    = carouselState.pageSize();
+  const start = page * ps;
+  const slice = photos.slice(start, start + ps);
+
+  if (!photos.length) {
     emptyEl?.classList.remove('hidden');
     return;
   }
   emptyEl?.classList.add('hidden');
 
-  filtered.forEach((photo, i) => {
-    const src = photo.imageBase64 || '';
+  slice.forEach((photo, i) => {
+    // Support imageUrl (live), driveUrl (old), imageBase64/URL (demo)
+    const src = photo.imageUrl || photo.driveUrl || photo.imageBase64 || '';
     if (!src) return;
 
     const catLabel = CATEGORY_LABELS[photo.category] || photo.category || '';
 
     const fig = document.createElement('figure');
-    fig.className    = 'gallery-item';
+    fig.className        = 'gallery-item';
     fig.dataset.category = photo.category || 'lain';
-    fig.dataset.index    = String(i);
+    fig.dataset.index    = String(start + i); // absolute index across all pages
 
     fig.innerHTML = `
       <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.caption || catLabel + ' — ' + (photo.uploader || ''))}" loading="lazy" />
       ${photo.caption ? `<figcaption class="gallery-caption">${escapeHtml(photo.caption)}</figcaption>` : ''}
-      <div class="gallery-overlay" aria-hidden="true">
-        <span class="gallery-zoom">🔍</span>
-      </div>
       <span class="gallery-item-badge">${escapeHtml(catLabel)}</span>
     `;
 
     grid.appendChild(fig);
   });
+
+  // Slide-in animation direction
+  grid.classList.remove('slide-left', 'slide-right');
+  void grid.offsetWidth; // reflow
+  grid.classList.add('slide-in');
+  setTimeout(() => grid.classList.remove('slide-in'), 350);
+}
+
+function updateCarouselControls() {
+  const prevBtn   = document.getElementById('gallery-prev');
+  const nextBtn   = document.getElementById('gallery-next');
+  const dotsWrap  = document.getElementById('gallery-dots');
+  const pageLabel = document.getElementById('gallery-page-label');
+
+  const total = carouselState.totalPages();
+  const cur   = carouselState.page;
+
+  if (prevBtn) prevBtn.disabled = cur === 0;
+  if (nextBtn) nextBtn.disabled = cur === total - 1;
+
+  // Dots
+  if (dotsWrap) {
+    dotsWrap.innerHTML = '';
+    // Only show dots if more than 1 page
+    if (total > 1) {
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('button');
+        dot.className   = 'gallery-dot' + (i === cur ? ' active' : '');
+        dot.setAttribute('aria-label', `Halaman ${i + 1}`);
+        dot.dataset.page = String(i);
+        dotsWrap.appendChild(dot);
+      }
+    }
+  }
+
+  if (pageLabel && total > 1) {
+    pageLabel.textContent = `${cur + 1} / ${total}`;
+    pageLabel.style.display = '';
+  } else if (pageLabel) {
+    pageLabel.style.display = 'none';
+  }
+}
+
+function navigatePage(dir, grid, emptyEl) {
+  const total = carouselState.totalPages();
+  const next  = carouselState.page + dir;
+  if (next < 0 || next >= total) return;
+
+  // Add directional class before swap
+  grid.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+  setTimeout(() => {
+    carouselState.page = next;
+    grid.classList.remove('exit-left', 'exit-right');
+    renderPage(grid, emptyEl);
+    updateCarouselControls();
+  }, 220);
 }
 
 // ─── Fetch photos ─────────────────────────────────────────────────────────────
@@ -155,7 +193,7 @@ async function fetchPhotos(grid, emptyEl, skeletonEl, activeFilter) {
   grid.innerHTML = '';
 
   try {
-    const res  = await fetch(`${GALLERY_SCRIPT_URL}?t=${Date.now()}`, { cache: 'no-store' });
+    const res  = await fetch(`${GALLERY_SCRIPT_URL}?action=gallery&t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     skeletonEl?.classList.add('hidden');
@@ -170,19 +208,43 @@ async function fetchPhotos(grid, emptyEl, skeletonEl, activeFilter) {
   }
 }
 
-// ─── Upload ───────────────────────────────────────────────────────────────────
+// ─── Upload to ImgBB then save metadata to Sheets ────────────────────────────
+async function uploadToImgBB(base64DataUrl) {
+  // Strip the data URL prefix — ImgBB wants raw base64
+  const raw = base64DataUrl.replace(/^data:[^;]+;base64,/, '');
+  const form = new FormData();
+  form.append('key',    IMGBB_KEY);
+  form.append('image',  raw);
+
+  const res  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: form });
+  if (!res.ok) throw new Error(`ImgBB HTTP ${res.status}`);
+  const json = await res.json();
+  if (!json.success) throw new Error(`ImgBB error: ${json.error?.message || 'unknown'}`);
+  // Return the display URL (medium size if available, else full)
+  return json.data.medium?.url || json.data.url;
+}
+
 async function submitPhoto(payload, alertEl, btnEl, btnText, btnLoading) {
   btnEl.disabled = true;
   btnText.classList.add('hidden');
   btnLoading.classList.remove('hidden');
 
   try {
-    const res = await fetch(GALLERY_SCRIPT_URL, {
+    // Step 1 — upload image to ImgBB
+    const imageUrl = await uploadToImgBB(payload.imageBase64);
+
+    // Step 2 — save metadata (URL, not base64) to Google Sheets
+    await fetch(GALLERY_SCRIPT_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify({
+        action:   'gallery',
+        category: payload.category,
+        imageUrl,
+      }),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     showUploadAlert(alertEl, 'Gambar berjaya dihantar! 📸', 'success');
     return true;
   } catch (err) {
@@ -243,8 +305,13 @@ function initUploadForm(onSuccess) {
   const fileErr     = document.getElementById('upload-file-err');
   const alertEl     = document.getElementById('gallery-upload-alert');
   const submitBtn   = document.getElementById('gallery-upload-btn');
+  const btnText     = submitBtn?.querySelector('.gallery-upload-btn-text');
+  const btnLoading  = submitBtn?.querySelector('.gallery-upload-btn-loading');
 
-  if (!form) return;
+  if (!form) {
+    console.error('[Gallery] Upload form not found — cannot init');
+    return;
+  }
 
   let selectedFile = null;
 
@@ -296,19 +363,12 @@ function initUploadForm(onSuccess) {
     e.preventDefault();
 
     // Clear errors
-    [nameErr, catErr, fileErr].forEach(el => { if (el) el.textContent = ''; });
-    [nameInput, catSelect, fileInput].forEach(el => el?.classList.remove('invalid'));
+    [catErr, fileErr].forEach(el => { if (el) el.textContent = ''; });
+    catSelect?.classList.remove('invalid');
 
-    const uploader = nameInput?.value.trim() || '';
     const category = catSelect?.value || '';
-    const caption  = captionInput?.value.trim() || '';
     let valid = true;
 
-    if (uploader.length < 2) {
-      if (nameErr) nameErr.textContent = 'Sila masukkan nama anda.';
-      nameInput?.classList.add('invalid');
-      valid = false;
-    }
     if (!category) {
       if (catErr) catErr.textContent = 'Sila pilih kategori.';
       catSelect?.classList.add('invalid');
@@ -326,7 +386,7 @@ function initUploadForm(onSuccess) {
 
     try {
       const imageBase64 = await resizeAndEncode(selectedFile);
-      const ok = await submitPhoto({ uploader, category, caption, imageBase64 }, alertEl, submitBtn, btnText, btnLoading);
+      const ok = await submitPhoto({ category, caption: '', uploader: '', imageBase64 }, alertEl, submitBtn, btnText, btnLoading);
       if (ok) {
         form.reset();
         clearPreview();
@@ -492,21 +552,19 @@ function initLightbox() {
 
   if (!lightbox) return;
 
-  function getVisibleItems() {
-    return Array.from(document.querySelectorAll('#gallery-grid .gallery-item'));
-  }
-
+  // Lightbox navigates across ALL filtered photos, not just the current page
   let currentIndex = 0;
 
+  function getPhoto(index) {
+    return carouselState.photos[index] || null;
+  }
+
   function openLightbox(index) {
-    const items = getVisibleItems();
-    const item  = items[index];
-    if (!item) return;
-    const img = item.querySelector('img');
-    const cap = item.querySelector('.gallery-caption');
-    lbImg.src             = img.src;
-    lbImg.alt             = img.alt;
-    lbCaption.textContent = cap ? cap.textContent : '';
+    const photo = getPhoto(index);
+    if (!photo) return;
+    lbImg.src             = photo.imageUrl || photo.driveUrl || photo.imageBase64 || '';
+    lbImg.alt             = photo.caption || photo.uploader || '';
+    lbCaption.textContent = photo.caption || '';
     currentIndex          = index;
     lightbox.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
@@ -520,18 +578,16 @@ function initLightbox() {
   }
 
   function navigate(dir) {
-    const items = getVisibleItems();
-    if (!items.length) return;
-    currentIndex = (currentIndex + dir + items.length) % items.length;
-    const item = items[currentIndex];
-    const img  = item.querySelector('img');
-    const cap  = item.querySelector('.gallery-caption');
+    const total = carouselState.photos.length;
+    if (!total) return;
+    currentIndex = (currentIndex + dir + total) % total;
+    const photo = getPhoto(currentIndex);
     lbImg.style.opacity   = '0';
     lbImg.style.transform = `translateX(${dir > 0 ? '-20px' : '20px'})`;
     setTimeout(() => {
-      lbImg.src             = img.src;
-      lbImg.alt             = img.alt;
-      lbCaption.textContent = cap ? cap.textContent : '';
+      lbImg.src             = photo.imageUrl || photo.driveUrl || photo.imageBase64 || '';
+      lbImg.alt             = photo.caption || photo.uploader || '';
+      lbCaption.textContent = photo.caption || '';
       lbImg.style.opacity   = '1';
       lbImg.style.transform = 'none';
     }, 180);
@@ -539,11 +595,12 @@ function initLightbox() {
 
   if (lbImg) lbImg.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
 
+  // Open lightbox on grid item click — map to absolute index via data-index
   document.addEventListener('click', (e) => {
     const item = e.target.closest('#gallery-grid .gallery-item');
     if (!item) return;
-    const items = getVisibleItems();
-    openLightbox(items.indexOf(item));
+    const idx = parseInt(item.dataset.index, 10);
+    if (!isNaN(idx)) openLightbox(idx);
   });
 
   lbClose?.addEventListener('click', closeLightbox);
@@ -572,10 +629,52 @@ export function initGallery() {
   const emptyEl    = document.getElementById('gallery-empty');
   const skeletonEl = document.getElementById('gallery-skeleton');
   const noticeEl   = document.getElementById('gallery-config-notice');
+  const prevBtn    = document.getElementById('gallery-prev');
+  const nextBtn    = document.getElementById('gallery-next');
+  const dotsWrap   = document.getElementById('gallery-dots');
 
   if (!grid) return;
 
   initLightbox();
+
+  // Carousel prev/next buttons
+  prevBtn?.addEventListener('click', () => navigatePage(-1, grid, emptyEl));
+  nextBtn?.addEventListener('click', () => navigatePage(+1, grid, emptyEl));
+
+  // Dot navigation
+  dotsWrap?.addEventListener('click', (e) => {
+    const dot = e.target.closest('.gallery-dot');
+    if (!dot) return;
+    const target = parseInt(dot.dataset.page, 10);
+    if (target === carouselState.page) return;
+    const dir = target > carouselState.page ? 1 : -1;
+    grid.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+    setTimeout(() => {
+      carouselState.page = target;
+      grid.classList.remove('exit-left', 'exit-right');
+      renderPage(grid, emptyEl);
+      updateCarouselControls();
+    }, 220);
+  });
+
+  // Touch swipe on the grid itself
+  let swipeStartX = 0;
+  grid.addEventListener('touchstart', e => { swipeStartX = e.changedTouches[0].clientX; }, { passive: true });
+  grid.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - swipeStartX;
+    if (Math.abs(dx) > 60) navigatePage(dx < 0 ? +1 : -1, grid, emptyEl);
+  });
+
+  // Re-render on resize (page size may change between mobile/desktop)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      carouselState.page = 0;
+      renderPage(grid, emptyEl);
+      updateCarouselControls();
+    }, 250);
+  });
 
   let currentFilter = 'all';
   let allPhotos     = [];
