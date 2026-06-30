@@ -671,21 +671,23 @@ export function initGallery() {
     if (Math.abs(dx) > 60) navigatePage(dx < 0 ? +1 : -1, grid, emptyEl);
   });
 
-  // Re-render on resize only when page size (mobile/desktop breakpoint) actually changes
+  // Re-render only when crossing the mobile/desktop breakpoint (768px).
+  // Use visualViewport on mobile to avoid reflows from browser chrome show/hide.
   let lastPageSize = carouselState.pageSize();
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const newPageSize = carouselState.pageSize();
-      if (newPageSize !== lastPageSize) {
-        lastPageSize = newPageSize;
-        carouselState.page = 0;
-        renderPage(grid, emptyEl);
-        updateCarouselControls();
-      }
-    }, 300);
-  });
+  const onResize = () => {
+    const next = carouselState.pageSize();
+    if (next !== lastPageSize) {
+      lastPageSize = next;
+      carouselState.page = 0;
+      renderPage(grid, emptyEl);
+      updateCarouselControls();
+    }
+  };
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', onResize);
+  } else {
+    window.addEventListener('resize', onResize);
+  }
 
   let currentFilter = 'all';
   let allPhotos     = [];

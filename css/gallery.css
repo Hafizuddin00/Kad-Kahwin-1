@@ -315,14 +315,7 @@
   .gallery-skeleton { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ---- Gallery header (count + refresh) ---- */
-.gallery-messages-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 1100px;
-  margin: 0 auto 16px;
-}
+/* ---- Gallery header uses .guestbook-messages-header from guestbook.css ---- */
 
 /* ---- Filters ---- */
 .gallery-filters {
