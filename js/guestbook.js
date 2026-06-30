@@ -39,11 +39,20 @@ function getInitial(name) {
 }
 
 // ─── Render ──────────────────────────────────────────────────────────────────
-function renderMessages(messages, grid, countEl, emptyEl) {
-  grid.innerHTML = '';
+let _lastGuestbookHash = '';
 
+function renderMessages(messages, grid, countEl, emptyEl) {
   const validMessages = messages.filter(m => m.name && m.message);
 
+  // Skip re-render if content hasn't changed
+  const hash = validMessages.map(m => m.name + m.message + m.time).join('|');
+  if (hash === _lastGuestbookHash && grid.children.length > 0) {
+    if (countEl) countEl.textContent = validMessages.length;
+    return;
+  }
+  _lastGuestbookHash = hash;
+
+  grid.innerHTML = '';
   if (countEl) countEl.textContent = validMessages.length;
 
   if (!validMessages.length) {
