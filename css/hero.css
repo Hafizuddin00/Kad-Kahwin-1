@@ -213,4 +213,5 @@
 @media (max-width: 520px) {
   .hero-names { gap: 4px; }
   .name-ampersand { font-size: 2.8rem; }
+  .hero-names span { display: block; }
 }
