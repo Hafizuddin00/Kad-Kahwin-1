@@ -4,19 +4,15 @@
 
 .location-section {
   background: var(--bg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 /* ---- Grid ---- */
 .location-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 28px;
   max-width: 960px;
-  margin: 0 auto 32px;
+  margin: 0 auto 48px;
 }
 
 /* ---- Card ---- */
@@ -36,7 +32,7 @@
 }
 
 .location-card-header {
-  padding: 16px 20px 12px;
+  padding: 24px 24px 16px;
 }
 .location-badge {
   display: inline-block;
@@ -73,7 +69,7 @@
 /* ---- Map ---- */
 .map-container {
   flex: 1;
-  min-height: 180px;
+  min-height: 240px;
   position: relative;
   overflow: hidden;
 }
@@ -91,7 +87,7 @@
 }
 
 .location-btn {
-  margin: 12px 16px 16px;
+  margin: 16px 20px 20px;
   text-align: center;
   font-size: 0.82rem;
 }
@@ -100,13 +96,13 @@
 .location-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 24px;
   justify-content: center;
   max-width: 800px;
   margin: 0 auto;
   background: var(--white);
   border-radius: var(--radius);
-  padding: 20px 24px;
+  padding: 28px 32px;
   box-shadow: 0 2px 16px var(--shadow);
   border: 1px solid rgba(212,175,55,0.12);
 }

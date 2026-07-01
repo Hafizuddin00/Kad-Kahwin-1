@@ -19,7 +19,7 @@
   --shadow:    rgba(0,0,0,0.10);
   --radius:    12px;
   --max-w:     1200px;
-  --section-pad: 64px 20px;
+  --section-pad: 90px 20px;
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-script:  'Great Vibes', cursive;
   --font-body:    'Lato', sans-serif;
@@ -109,25 +109,12 @@ body {
   margin: 0 auto;
   padding: var(--section-pad);
   width: 100%;
-  box-sizing: border-box;
-}
-
-/* When section is flex-column (min-height:100vh), wrapper fills available space */
-.event-section .section-wrapper,
-.countdown-section .section-wrapper,
-.rsvp-section .section-wrapper,
-.location-section .section-wrapper,
-.gallery-section .section-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 /* ---- Section Title ---- */
 .section-title {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 56px;
 }
 .section-title .script-label {
   display: block;
@@ -222,6 +209,6 @@ body {
 
 /* ---- Responsive helpers ---- */
 @media (max-width: 768px) {
-  :root { --section-pad: 48px 18px; }
-  .section-title { margin-bottom: 24px; }
+  :root { --section-pad: 60px 18px; }
+  .section-title { margin-bottom: 36px; }
 }

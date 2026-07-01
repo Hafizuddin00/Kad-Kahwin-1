@@ -4,10 +4,6 @@
 
 .rsvp-section {
   position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   background:
     linear-gradient(
       160deg,
@@ -32,10 +28,10 @@
 
 .rsvp-deadline {
   text-align: center;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   color: rgba(255,255,255,0.7);
-  margin-top: -8px;
-  margin-bottom: 20px;
+  margin-top: -20px;
+  margin-bottom: 44px;
   letter-spacing: 0.04em;
 }
 .rsvp-deadline strong { color: var(--gold-light); }
@@ -49,7 +45,7 @@
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(212,175,55,0.2);
   border-radius: 18px;
-  padding: 24px 28px;
+  padding: 44px 40px;
 }
 
 /* ---- Form Row ---- */
@@ -63,8 +59,8 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 7px;
+  margin-bottom: 22px;
 }
 .form-group label {
   font-size: 0.8rem;
@@ -108,7 +104,7 @@
 .form-group select { cursor: pointer; }
 .form-group select option { background: #2a1f0e; color: var(--white); }
 
-.form-group textarea { resize: vertical; min-height: 72px; }
+.form-group textarea { resize: vertical; min-height: 110px; }
 
 .char-count {
   align-self: flex-end;

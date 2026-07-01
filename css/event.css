@@ -5,10 +5,6 @@
 .event-section {
   background: var(--bg);
   position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   overflow: hidden;
 }
 .event-section::before {
@@ -26,27 +22,27 @@
 .event-intro {
   text-align: center;
   max-width: 600px;
-  margin: -10px auto 32px;
-  font-size: 0.98rem;
+  margin: -20px auto 52px;
+  font-size: 1.05rem;
   color: var(--text-light);
   font-style: italic;
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 /* ---- Cards Grid ---- */
 .event-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 28px;
   max-width: 1060px;
-  margin: 0 auto 36px;
+  margin: 0 auto 56px;
 }
 
 /* ---- Single Card ---- */
 .event-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 24px 24px 20px;
+  padding: 36px 28px 32px;
   text-align: center;
   box-shadow: 0 4px 28px var(--shadow);
   border: 1px solid rgba(212,175,55,0.12);
@@ -155,7 +151,7 @@
   text-align: center;
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px 32px;
+  padding: 28px 32px;
   border-left: none;
   position: relative;
 }
