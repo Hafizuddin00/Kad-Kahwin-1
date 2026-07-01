@@ -33,26 +33,11 @@
   gap: 12px;
   max-width: 1100px;
   margin: 0 auto 24px;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  flex-wrap: wrap;
 }
 .gallery-toolbar .gallery-filters {
   margin-bottom: 0;
   flex: 1;
-}
-.gallery-filters {
-  overflow-y: hidden;
-  overflow-x: auto;
-  gap: 10px;
-  scroll-behavior: smooth;
-}
-.gallery-filters::-webkit-scrollbar {
-  display: none;             /* Chrome/Safari */
-}
-
-.gallery-filter-btn {
-  flex: 0 0 auto;            /* prevent shrinking */
-  white-space: nowrap;       /* keep text in one line */
 }
 .gallery-upload-inline-btn {
   flex-shrink: 0;
@@ -327,6 +312,7 @@
   color: var(--text-light);
   font-style: italic;
 }
+.gallery-empty.hidden { display: none; }
 .gallery-empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
 
 /* Category badge on card */
@@ -358,12 +344,17 @@
 /* ---- Filters ---- */
 .gallery-filters {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* hide scrollbar Firefox */
+  padding-bottom: 4px;   /* prevent clipping on scroll */
 }
+.gallery-filters::-webkit-scrollbar { display: none; } /* hide scrollbar Chrome/Safari */
 .gallery-filter-btn {
+  flex-shrink: 0;
   background: transparent;
   border: 1px solid rgba(212,175,55,0.45);
   color: var(--text-light);
@@ -375,6 +366,7 @@
   border-radius: 50px;
   cursor: pointer;
   transition: all var(--transition);
+  white-space: nowrap;
 }
 .gallery-filter-btn:hover,
 .gallery-filter-btn.active {
