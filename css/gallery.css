@@ -312,7 +312,6 @@
   color: var(--text-light);
   font-style: italic;
 }
-.gallery-empty.hidden { display: none; }
 .gallery-empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
 
 /* Category badge on card */
@@ -344,17 +343,12 @@
 /* ---- Filters ---- */
 .gallery-filters {
   display: flex;
-  flex-wrap: nowrap;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 24px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* hide scrollbar Firefox */
-  padding-bottom: 4px;   /* prevent clipping on scroll */
 }
-.gallery-filters::-webkit-scrollbar { display: none; } /* hide scrollbar Chrome/Safari */
 .gallery-filter-btn {
-  flex-shrink: 0;
   background: transparent;
   border: 1px solid rgba(212,175,55,0.45);
   color: var(--text-light);
@@ -366,7 +360,6 @@
   border-radius: 50px;
   cursor: pointer;
   transition: all var(--transition);
-  white-space: nowrap;
 }
 .gallery-filter-btn:hover,
 .gallery-filter-btn.active {
