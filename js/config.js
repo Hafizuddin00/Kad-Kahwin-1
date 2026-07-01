@@ -10,6 +10,6 @@
  *   3. Paste the key below
  */
 
-export const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwt8AKHgsLO6dJRnutUEN-BjZoKp-HJ5s5-DKyFy-LmVdeSUeMyc9IUt43JObXWuMnG/exec';
+export const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQHs-Uvcq10ERuTWoHomHfElgN7NIaZlPT_CpcB8FwruJlaWeztP8_7Ya1QX7XUcWO/exec';
 
 export const IMGBB_KEY  = 'b6144929a0b8e5b838842e45ece3c6db'; // ← Paste your ImgBB API key here

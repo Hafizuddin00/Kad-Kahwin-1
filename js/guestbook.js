@@ -8,6 +8,21 @@
 import { SCRIPT_URL } from './config.js';
 const GOOGLE_SCRIPT_URL = SCRIPT_URL;
 
+// ─── Generate a short random ID for new messages ─────────────────────────────
+function generateMsgId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ─── Device ID — generated once, persisted in localStorage ───────────────────
+function getDeviceId() {
+  let id = localStorage.getItem('wedding_device_id');
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem('wedding_device_id', id);
+  }
+  return id;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function escapeHtml(str) {
   return String(str)
@@ -38,6 +53,107 @@ function getInitial(name) {
   return (name || '?').trim().charAt(0).toUpperCase();
 }
 
+// ─── Toggle like — optimistic update ─────────────────────────────────────────
+function toggleLike(msgId, btn, countSpan) {
+  if (btn.dataset.pending === '1') return; // debounce — ignore if request in flight
+
+  const wasLiked  = btn.classList.contains('loved');
+  const prevCount = parseInt(countSpan.textContent || '0');
+  const newLiked  = !wasLiked;
+  const newCount  = newLiked ? prevCount + 1 : Math.max(0, prevCount - 1);
+
+  // ── Instant UI update ──
+  btn.classList.toggle('loved', newLiked);
+  btn.setAttribute('aria-pressed', String(newLiked));
+  btn.setAttribute('aria-label', newLiked ? 'Unlike this wish' : 'Like this wish');
+  btn.querySelector('.gb-love-icon').textContent = newLiked ? '❤️' : '🤍';
+  countSpan.textContent = newCount > 0 ? String(newCount) : '';
+
+  // Mark in-flight (doesn't block clicks visually, just prevents double-send)
+  btn.dataset.pending = '1';
+
+  const deviceId = getDeviceId();
+  fetch(GOOGLE_SCRIPT_URL, {
+    method:  'POST',
+    mode:    'cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify({ action: 'like', msgId, deviceId }),
+  })
+    .then(r => r.text())
+    .then(text => {
+      const json = JSON.parse(text);
+      if (json.status === 'ok') {
+        // Reconcile count from server in case of concurrent likes
+        countSpan.textContent = json.likes > 0 ? String(json.likes) : '';
+        btn.classList.toggle('loved', json.liked);
+        btn.querySelector('.gb-love-icon').textContent = json.liked ? '❤️' : '🤍';
+      } else {
+        throw new Error(json.msg || 'Server error');
+      }
+    })
+    .catch(err => {
+      console.error('[Guestbook] Like error:', err);
+      // Revert on failure
+      btn.classList.toggle('loved', wasLiked);
+      btn.setAttribute('aria-pressed', String(wasLiked));
+      btn.setAttribute('aria-label', wasLiked ? 'Unlike this wish' : 'Like this wish');
+      btn.querySelector('.gb-love-icon').textContent = wasLiked ? '❤️' : '🤍';
+      countSpan.textContent = prevCount > 0 ? String(prevCount) : '';
+    })
+    .finally(() => {
+      delete btn.dataset.pending;
+    });
+}
+
+// ─── Build a single card element ─────────────────────────────────────────────
+function buildCard(msg) {
+  const liked = !!msg.likedByMe;
+  const likes = msg.likes || 0;
+
+  const card = document.createElement('article');
+  card.className = 'gb-card';
+  card.setAttribute('aria-label', `Wish from ${escapeHtml(msg.name)}`);
+
+  card.innerHTML = `
+    <div class="gb-card-header">
+      <div class="gb-card-avatar" aria-hidden="true">${escapeHtml(getInitial(msg.name))}</div>
+      <div>
+        <div class="gb-card-name">${escapeHtml(msg.name)}</div>
+        ${msg.time ? `<div class="gb-card-time">${escapeHtml(formatTime(msg.time))}</div>` : ''}
+      </div>
+    </div>
+    <p class="gb-card-message">${escapeHtml(msg.message)}</p>
+    <div class="gb-card-footer">
+      <button class="gb-love-btn${liked ? ' loved' : ''}"
+        aria-label="${liked ? 'Unlike' : 'Like'} this wish"
+        aria-pressed="${liked}">
+        <span class="gb-love-icon">${liked ? '❤️' : '🤍'}</span>
+        <span class="gb-love-count">${likes > 0 ? likes : ''}</span>
+      </button>
+    </div>
+  `;
+
+  if (msg.id) {
+    const btn       = card.querySelector('.gb-love-btn');
+    const countSpan = card.querySelector('.gb-love-count');
+    btn.addEventListener('click', () => toggleLike(msg.id, btn, countSpan));
+  }
+
+  return card;
+}
+
+// ─── Prepend a single new card without re-rendering ──────────────────────────
+function prependCard(msg, grid, countEl, emptyEl) {
+  emptyEl?.classList.add('hidden');
+  const card = buildCard(msg);
+  card.classList.add('gb-card-new'); // trigger slide-in animation
+  grid.prepend(card);
+  // Scroll to top so user sees their new message
+  grid.scrollTo({ top: 0, behavior: 'smooth' });
+  // Update count
+  if (countEl) countEl.textContent = String(grid.querySelectorAll('.gb-card').length);
+}
+
 // ─── Render ──────────────────────────────────────────────────────────────────
 function renderMessages(messages, grid, countEl, emptyEl) {
   grid.innerHTML = '';
@@ -52,25 +168,7 @@ function renderMessages(messages, grid, countEl, emptyEl) {
   }
   emptyEl?.classList.add('hidden');
 
-  validMessages.forEach((msg, i) => {
-    const card = document.createElement('article');
-    card.className = 'gb-card';
-    card.setAttribute('aria-label', `Wish from ${escapeHtml(msg.name)}`);
-    card.style.animationDelay = `${i * 60}ms`;
-
-    card.innerHTML = `
-      <div class="gb-card-header">
-        <div class="gb-card-avatar" aria-hidden="true">${escapeHtml(getInitial(msg.name))}</div>
-        <div>
-          <div class="gb-card-name">${escapeHtml(msg.name)}</div>
-          ${msg.time ? `<div class="gb-card-time">${escapeHtml(formatTime(msg.time))}</div>` : ''}
-        </div>
-      </div>
-      <p class="gb-card-message">${escapeHtml(msg.message)}</p>
-    `;
-
-    grid.appendChild(card);
-  });
+  validMessages.forEach(msg => grid.appendChild(buildCard(msg)));
 }
 
 // ─── Fetch messages ───────────────────────────────────────────────────────────
@@ -81,11 +179,12 @@ async function fetchMessages(grid, countEl, emptyEl, skeletonEl) {
   grid.innerHTML = '';
 
   try {
-    // Cache-bust with timestamp to avoid stale responses
-    const url  = `${GOOGLE_SCRIPT_URL}?action=guestbook&t=${Date.now()}`;
+    const deviceId = getDeviceId();
+    const url  = `${GOOGLE_SCRIPT_URL}?action=guestbook&deviceId=${encodeURIComponent(deviceId)}&t=${Date.now()}`;
     const res  = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const text = await res.text();
+    const data = JSON.parse(text);
 
     skeletonEl?.classList.add('hidden');
     renderMessages(Array.isArray(data) ? data : [], grid, countEl, emptyEl);
@@ -99,19 +198,19 @@ async function fetchMessages(grid, countEl, emptyEl, skeletonEl) {
 }
 
 // ─── Submit ───────────────────────────────────────────────────────────────────
-async function submitMessage({ name, message }, alertEl, btnEl, btnText, btnLoading) {
+async function submitMessage({ id, name, message }, alertEl, btnEl, btnText, btnLoading) {
   btnEl.disabled = true;
   btnText.classList.add('hidden');
   btnLoading.classList.remove('hidden');
 
   try {
-    const res = await fetch(GOOGLE_SCRIPT_URL, {
+    await fetch(GOOGLE_SCRIPT_URL, {
       method:  'POST',
       mode:    'no-cors',
       headers: { 'Content-Type': 'text/plain' },
-      body:    JSON.stringify({ action: 'guestbook', name, message }),
+      body:    JSON.stringify({ action: 'guestbook', id, name, message }),
     });
-    // no-cors returns opaque response — can't read res.ok, assume success if no throw
+    // no-cors returns opaque response — assume success if no throw
 
     showAlert(alertEl, 'Your wish has been sent! 💌', 'success');
     return true;
@@ -155,12 +254,12 @@ export function initGuestbook() {
 
     // Add demo messages so the UI isn't empty
     const demoMessages = [
-      { name: 'Emily Johnson',  message: 'Wishing you both a lifetime of happiness and love! Congratulations! 🎉', time: new Date(Date.now() - 60000 * 30).toISOString() },
-      { name: 'Michael Chen',   message: 'May your love story be forever beautiful. So happy for you both! ❤️',   time: new Date(Date.now() - 60000 * 90).toISOString() },
-      { name: 'Sophia Patel',   message: 'Two hearts, one beautiful journey. Sending all our love on your special day!', time: new Date(Date.now() - 60000 * 180).toISOString() },
-      { name: 'David Williams', message: 'The best is yet to come! Congratulations Sarah & James 🥂',               time: new Date(Date.now() - 60000 * 300).toISOString() },
-      { name: 'Olivia Martinez',message: 'Wishing you both endless love, laughter and happily ever after! 💍',      time: new Date(Date.now() - 60000 * 420).toISOString() },
-      { name: 'Lucas Thompson', message: 'A perfect match! May your days be filled with joy and your home with love.', time: new Date(Date.now() - 60000 * 600).toISOString() },
+      { id: 'demo1', name: 'Emily Johnson',   message: 'Wishing you both a lifetime of happiness and love! Congratulations! 🎉', time: new Date(Date.now() - 60000 * 30).toISOString(),  likes: 5,  likedByMe: false },
+      { id: 'demo2', name: 'Michael Chen',    message: 'May your love story be forever beautiful. So happy for you both! ❤️',   time: new Date(Date.now() - 60000 * 90).toISOString(),  likes: 3,  likedByMe: false },
+      { id: 'demo3', name: 'Sophia Patel',    message: 'Two hearts, one beautiful journey. Sending all our love on your special day!', time: new Date(Date.now() - 60000 * 180).toISOString(), likes: 8, likedByMe: true  },
+      { id: 'demo4', name: 'David Williams',  message: 'The best is yet to come! Congratulations Dinie & Fatihqa 🥂',           time: new Date(Date.now() - 60000 * 300).toISOString(), likes: 2,  likedByMe: false },
+      { id: 'demo5', name: 'Olivia Martinez', message: 'Wishing you both endless love, laughter and happily ever after! 💍',    time: new Date(Date.now() - 60000 * 420).toISOString(), likes: 6,  likedByMe: false },
+      { id: 'demo6', name: 'Lucas Thompson',  message: 'A perfect match! May your days be filled with joy and your home with love.', time: new Date(Date.now() - 60000 * 600).toISOString(), likes: 1, likedByMe: false },
     ];
     renderMessages(demoMessages, grid, countEl, emptyEl);
     setupLocalMode(form, grid, countEl, emptyEl, alertEl);
@@ -220,12 +319,15 @@ export function initGuestbook() {
     }
     if (!valid) return;
 
-    const ok = await submitMessage({ name, message }, alertEl, submitBtn, btnText, btnLoading);
+    const msgId = generateMsgId();
+    const ok = await submitMessage({ id: msgId, name, message }, alertEl, submitBtn, btnText, btnLoading);
     if (ok) {
       form.reset();
       if (charCount) charCount.textContent = '0 / 400';
-      // Refresh the list
-      await fetchMessages(grid, countEl, emptyEl, null);
+      prependCard(
+        { id: msgId, name, message, time: new Date().toISOString(), likes: 0, likedByMe: false },
+        grid, countEl, emptyEl
+      );
     }
   });
 }
@@ -298,13 +400,14 @@ function setupLocalMode(form, grid, countEl, emptyEl, alertEl) {
     if (submitBtn)  submitBtn.disabled = true;
 
     setTimeout(() => {
-      const newMsg = { time: new Date().toISOString(), name, message };
+      const newMsg = { id: generateMsgId(), time: new Date().toISOString(), name, message, likes: 0, likedByMe: false };
       localMessages.unshift(newMsg);
       persist();
 
       form.reset();
       if (charCount) charCount.textContent = '0 / 400';
-      rerender();
+      // Prepend only the new card — no full re-render
+      prependCard(newMsg, grid, countEl, emptyEl);
       showAlert(alertEl, 'Your wish has been saved! 💌 (Demo mode — configure Google Sheets for persistence)', 'success');
 
       if (btnText)    btnText.classList.remove('hidden');

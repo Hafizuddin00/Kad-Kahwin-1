@@ -112,23 +112,7 @@ function renderPage(grid, emptyEl) {
   emptyEl?.classList.add('hidden');
 
   slice.forEach((photo, i) => {
-    // Support imageUrl (live), driveUrl (old), imageBase64/URL (demo)
-    const src = photo.imageUrl || photo.driveUrl || photo.imageBase64 || '';
-    if (!src) return;
-
-    const catLabel = CATEGORY_LABELS[photo.category] || photo.category || '';
-
-    const fig = document.createElement('figure');
-    fig.className        = 'gallery-item';
-    fig.dataset.category = photo.category || 'lain';
-    fig.dataset.index    = String(start + i); // absolute index across all pages
-
-    fig.innerHTML = `
-      <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.caption || catLabel + ' — ' + (photo.uploader || ''))}" loading="lazy" />
-      ${photo.caption ? `<figcaption class="gallery-caption">${escapeHtml(photo.caption)}</figcaption>` : ''}
-      <span class="gallery-item-badge">${escapeHtml(catLabel)}</span>
-    `;
-
+    const fig = buildPhotoItem(photo, start + i);
     grid.appendChild(fig);
   });
 
@@ -137,6 +121,41 @@ function renderPage(grid, emptyEl) {
   void grid.offsetWidth; // reflow
   grid.classList.add('slide-in');
   setTimeout(() => grid.classList.remove('slide-in'), 350);
+}
+
+// ─── Build a single photo figure element ─────────────────────────────────────
+function buildPhotoItem(photo, absoluteIndex) {
+  const src      = photo.imageUrl || photo.driveUrl || photo.imageBase64 || '';
+  const catLabel = CATEGORY_LABELS[photo.category] || photo.category || '';
+
+  const fig = document.createElement('figure');
+  fig.className        = 'gallery-item';
+  fig.dataset.category = photo.category || 'lain';
+  fig.dataset.index    = String(absoluteIndex);
+
+  fig.innerHTML = `
+    <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.caption || catLabel)}" loading="lazy" />
+    ${photo.caption ? `<figcaption class="gallery-caption">${escapeHtml(photo.caption)}</figcaption>` : ''}
+    <div class="gallery-overlay" aria-hidden="true"><span class="gallery-zoom">🔍</span></div>
+    <span class="gallery-item-badge">${escapeHtml(catLabel)}</span>
+  `;
+
+  return fig;
+}
+
+// ─── Prepend a new photo without a network re-fetch ──────────────────────────
+function prependPhoto(photo, grid, emptyEl) {
+  // Insert at the front of the full list and the carousel state
+  carouselState.photos.unshift(photo);
+
+  // Update count
+  const countEl = document.getElementById('gallery-photo-count');
+  if (countEl) countEl.textContent = carouselState.photos.length;
+
+  // Jump to page 0 and re-render (cheap — no fetch)
+  carouselState.page = 0;
+  renderPage(grid, emptyEl);
+  updateCarouselControls();
 }
 
 function updateCarouselControls() {
@@ -199,7 +218,8 @@ async function fetchPhotos(grid, emptyEl, skeletonEl, activeFilter) {
   try {
     const res  = await fetch(`${GALLERY_SCRIPT_URL}?action=gallery&t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const text = await res.text();
+    const data = JSON.parse(text);
     skeletonEl?.classList.add('hidden');
     const photos = Array.isArray(data) ? data : [];
     renderPhotos(photos, grid, emptyEl, activeFilter);
@@ -250,11 +270,11 @@ async function submitPhoto(payload, alertEl, btnEl, btnText, btnLoading) {
     });
 
     showUploadAlert(alertEl, 'Gambar berjaya dihantar! 📸', 'success');
-    return true;
+    return imageUrl; // return URL so caller can prepend without re-fetch
   } catch (err) {
     console.error('[Gallery] Upload error:', err);
     showUploadAlert(alertEl, 'Gagal menghantar gambar. Cuba lagi.', 'error');
-    return false;
+    return null;
   } finally {
     btnEl.disabled = false;
     btnText.classList.remove('hidden');
@@ -390,16 +410,21 @@ function initUploadForm(onSuccess) {
 
     try {
       const imageBase64 = await resizeAndEncode(selectedFile);
-      const ok = await submitPhoto({ category, caption: '', uploader: '', imageBase64 }, alertEl, submitBtn, btnText, btnLoading);
-      if (ok) {
+      const imageUrl = await submitPhoto({ category, caption: '', uploader: '', imageBase64 }, alertEl, submitBtn, btnText, btnLoading);
+      if (imageUrl) {
         form.reset();
         clearPreview();
+        // Prepend new photo immediately — no re-fetch needed
+        const grid    = document.getElementById('gallery-grid');
+        const emptyEl = document.getElementById('gallery-empty');
+        prependPhoto({ category, imageUrl, time: new Date().toISOString() }, grid, emptyEl);
+        // Also keep allPhotos in sync for filter/lightbox
+        onSuccess(imageUrl, category);
         setTimeout(() => {
           document.getElementById('gallery-upload-modal')?.setAttribute('hidden', '');
           document.body.style.overflow = '';
           document.getElementById('gallery-upload-open-btn')?.focus();
         }, 1800);
-        onSuccess();
       }
     } catch (err) {
       console.error('[Gallery] Encode error:', err);
@@ -511,7 +536,8 @@ function setupDemoMode(grid, emptyEl, skeletonEl) {
       allPhotos = [...freshStored, ...demo];
       form.reset();
       clearPreview();
-      rerender(getCurrentFilter());
+      // Prepend only the new photo — no full re-render
+      prependPhoto(newPhoto, grid, emptyEl);
       showUploadAlert(alertEl, 'Gambar berjaya dihantar! 📸 (Demo — pasang Google Sheets untuk simpanan kekal)', 'success');
       setTimeout(() => {
         document.getElementById('gallery-upload-modal')?.setAttribute('hidden', '');
@@ -717,7 +743,11 @@ export function initGallery() {
   });
 
   initUploadModal();
-  initUploadForm(refresh);
+  // onSuccess receives the new imageUrl and category to sync allPhotos in-memory
+  initUploadForm((imageUrl, category) => {
+    const newPhoto = { category, imageUrl, time: new Date().toISOString() };
+    allPhotos.unshift(newPhoto);
+  });
 
   refresh();
 }
