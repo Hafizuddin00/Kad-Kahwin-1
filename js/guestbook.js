@@ -53,56 +53,87 @@ function getInitial(name) {
   return (name || '?').trim().charAt(0).toUpperCase();
 }
 
-// ─── Toggle like — optimistic update ─────────────────────────────────────────
-function toggleLike(msgId, btn, countSpan) {
-  if (btn.dataset.pending === '1') return; // debounce — ignore if request in flight
+// ─── Per-speech occupancy map ─────────────────────────────────────────────────
+// Tracks in-flight requests per speech. Each speech is independent.
+const _speechOccupied = new Map();
 
-  const wasLiked  = btn.classList.contains('loved');
-  const prevCount = parseInt(countSpan.textContent || '0');
-  const newLiked  = !wasLiked;
-  const newCount  = newLiked ? prevCount + 1 : Math.max(0, prevCount - 1);
+function isSpeechOccupied(msgId)   { return _speechOccupied.get(msgId) === true; }
+function markSpeechOccupied(msgId) { _speechOccupied.set(msgId, true); }
+function clearSpeechOccupied(msgId){ _speechOccupied.delete(msgId); }
 
-  // ── Instant UI update ──
-  btn.classList.toggle('loved', newLiked);
-  btn.setAttribute('aria-pressed', String(newLiked));
-  btn.setAttribute('aria-label', newLiked ? 'Unlike this wish' : 'Like this wish');
-  btn.querySelector('.gb-love-icon').textContent = newLiked ? '❤️' : '🤍';
-  countSpan.textContent = newCount > 0 ? String(newCount) : '';
+// ─── Like handler factory — one instance per card ────────────────────────────
+// UI reacts to every click instantly.
+// Backend: only one request per speech at a time. While a request is in-flight,
+// additional clicks update the UI immediately but are coalesced — only the final
+// desired state is sent once the current request settles.
+function makeLikeHandler(msgId, btn, countSpan) {
+  // pendingState: the desired state to send after the in-flight request settles.
+  // null = no pending click waiting.
+  let pendingState = null; // { liked, count, wasLiked, prevCount }
 
-  // Mark in-flight (doesn't block clicks visually, just prevents double-send)
-  btn.dataset.pending = '1';
+  function applyState(liked, count) {
+    btn.classList.toggle('loved', liked);
+    btn.setAttribute('aria-pressed', String(liked));
+    btn.setAttribute('aria-label', liked ? 'Unlike this wish' : 'Like this wish');
+    btn.querySelector('.gb-love-icon').textContent = liked ? '❤️' : '🤍';
+    countSpan.textContent = count > 0 ? String(count) : '';
+  }
 
-  const deviceId = getDeviceId();
-  fetch(GOOGLE_SCRIPT_URL, {
-    method:  'POST',
-    mode:    'cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify({ action: 'like', msgId, deviceId }),
-  })
-    .then(r => r.text())
-    .then(text => {
-      const json = JSON.parse(text);
-      if (json.status === 'ok') {
-        // Reconcile count from server in case of concurrent likes
-        countSpan.textContent = json.likes > 0 ? String(json.likes) : '';
-        btn.classList.toggle('loved', json.liked);
-        btn.querySelector('.gb-love-icon').textContent = json.liked ? '❤️' : '🤍';
-      } else {
-        throw new Error(json.msg || 'Server error');
-      }
+  function sendRequest(liked, count, revertLiked, revertCount) {
+    markSpeechOccupied(msgId);
+    const deviceId = getDeviceId();
+    fetch(GOOGLE_SCRIPT_URL, {
+      method:  'POST',
+      mode:    'cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify({ action: 'like', msgId, deviceId }),
     })
-    .catch(err => {
-      console.error('[Guestbook] Like error:', err);
-      // Revert on failure
-      btn.classList.toggle('loved', wasLiked);
-      btn.setAttribute('aria-pressed', String(wasLiked));
-      btn.setAttribute('aria-label', wasLiked ? 'Unlike this wish' : 'Like this wish');
-      btn.querySelector('.gb-love-icon').textContent = wasLiked ? '❤️' : '🤍';
-      countSpan.textContent = prevCount > 0 ? String(prevCount) : '';
-    })
-    .finally(() => {
-      delete btn.dataset.pending;
-    });
+      .then(r => r.text())
+      .then(text => {
+        const json = JSON.parse(text);
+        if (json.status === 'ok') {
+          // Only reconcile server count if no pending click is waiting
+          if (pendingState === null) {
+            countSpan.textContent = json.likes > 0 ? String(json.likes) : '';
+          }
+        } else {
+          throw new Error(json.msg || 'Server error');
+        }
+      })
+      .catch(err => {
+        console.error('[Guestbook] Like error:', err);
+        // Revert only if nothing is pending (pending will set its own state)
+        if (pendingState === null) applyState(revertLiked, revertCount);
+      })
+      .finally(() => {
+        clearSpeechOccupied(msgId);
+        // If a click came in while we were in-flight, send it now
+        if (pendingState !== null) {
+          const next = pendingState;
+          pendingState = null;
+          sendRequest(next.liked, next.count, next.revertLiked, next.revertCount);
+        }
+      });
+  }
+
+  return function handle() {
+    const wasLiked  = btn.classList.contains('loved');
+    const prevCount = parseInt(countSpan.textContent || '0');
+    const newLiked  = !wasLiked;
+    const newCount  = newLiked ? prevCount + 1 : Math.max(0, prevCount - 1);
+
+    // Always update UI instantly
+    applyState(newLiked, newCount);
+
+    if (isSpeechOccupied(msgId)) {
+      // Request in-flight — coalesce: overwrite pending state with latest click
+      pendingState = { liked: newLiked, count: newCount, revertLiked: wasLiked, revertCount: prevCount };
+    } else {
+      // No request in-flight — send immediately
+      pendingState = null;
+      sendRequest(newLiked, newCount, wasLiked, prevCount);
+    }
+  };
 }
 
 // ─── Build a single card element ─────────────────────────────────────────────
@@ -136,7 +167,8 @@ function buildCard(msg) {
   if (msg.id) {
     const btn       = card.querySelector('.gb-love-btn');
     const countSpan = card.querySelector('.gb-love-count');
-    btn.addEventListener('click', () => toggleLike(msg.id, btn, countSpan));
+    const handle    = makeLikeHandler(msg.id, btn, countSpan);
+    btn.addEventListener('click', handle);
   }
 
   return card;

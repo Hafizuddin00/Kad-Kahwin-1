@@ -3,13 +3,24 @@
    =========================== */
 
 .gallery-section {
-  background: #f8f4ee;
   position: relative;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(10,7,3,0.82) 0%,
+      rgba(20,14,7,0.78) 100%
+    ),
+    url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1600&q=80') center/cover no-repeat fixed;
+  color: var(--white);
 }
+.gallery-section .section-title .script-label { color: var(--gold-light); }
+.gallery-section .section-title h2            { color: var(--white); }
+.gallery-section .section-title .divider::before,
+.gallery-section .section-title .divider::after { background: rgba(212,175,55,0.45); }
 
 .gallery-desc {
   text-align: center;
-  color: var(--text-light);
+  color: rgba(255,255,255,0.65);
   font-style: italic;
   font-size: 1rem;
   margin-top: -24px;
@@ -248,15 +259,15 @@
   max-width: 680px;
   margin: 0 auto 24px;
   background: rgba(212,175,55,0.08);
-  border: 1px dashed rgba(212,175,55,0.4);
+  border: 1px dashed rgba(212,175,55,0.35);
   border-radius: 10px;
   padding: 14px 18px;
   font-size: 0.82rem;
-  color: var(--text-light);
+  color: rgba(255,255,255,0.6);
   text-align: center;
 }
 .gallery-config-notice code {
-  background: rgba(0,0,0,0.07);
+  background: rgba(255,255,255,0.1);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -273,7 +284,7 @@
 .gallery-skeleton-item {
   height: 200px;
   border-radius: 10px;
-  background: linear-gradient(90deg, #ede8e0 25%, #e0d9d0 50%, #ede8e0 75%);
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s infinite;
 }
@@ -286,7 +297,7 @@
 .gallery-empty {
   text-align: center;
   padding: 40px 16px;
-  color: var(--text-light);
+  color: rgba(255,255,255,0.55);
   font-style: italic;
 }
 .gallery-empty.hidden { display: none; }
@@ -329,7 +340,7 @@
 .gallery-filter-btn {
   background: transparent;
   border: 1px solid rgba(212,175,55,0.45);
-  color: var(--text-light);
+  color: rgba(255,255,255,0.7);
   font-family: var(--font-body);
   font-size: 0.8rem;
   letter-spacing: 0.12em;
@@ -382,14 +393,14 @@
   width: 40px; height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(212,175,55,0.5);
-  background: var(--white);
-  color: var(--gold);
+  background: rgba(255,255,255,0.08);
+  color: var(--gold-light);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background var(--transition), color var(--transition), transform var(--transition);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .gallery-carousel-btn:hover:not(:disabled) {
   background: var(--gold);
@@ -397,7 +408,7 @@
   transform: scale(1.08);
 }
 .gallery-carousel-btn:disabled {
-  opacity: 0.25;
+  opacity: 0.2;
   cursor: default;
 }
 
@@ -432,7 +443,7 @@
 
 .gallery-page-label {
   font-size: 0.78rem;
-  color: var(--text-light);
+  color: rgba(255,255,255,0.5);
   letter-spacing: 0.08em;
 }
 
@@ -443,6 +454,7 @@
   border-radius: 10px;
   cursor: pointer;
   background: #ddd;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.2);
 }
 .gallery-item img {
   width: 100%;

@@ -1,140 +1,113 @@
-<section id="rsvp" class="rsvp-section">
-  <div class="rsvp-bg-overlay" aria-hidden="true"></div>
+<!-- RSVP Modal — opened by the RSVP button on the event card -->
+<div id="rsvp-modal" class="rsvp-modal" role="dialog" aria-modal="true" aria-labelledby="rsvp-modal-title" hidden>
+  <div class="rsvp-modal-backdrop" id="rsvp-modal-backdrop"></div>
+  <div class="rsvp-modal-box">
+    <button class="rsvp-modal-close" id="rsvp-modal-close" aria-label="Tutup">✕</button>
 
-  <div class="section-wrapper">
-    <div class="section-title reveal">
+    <div class="rsvp-modal-header">
       <span class="script-label">Undangan</span>
-      <h2>RSVP</h2>
-      <div class="divider"><span class="divider-icon">✦</span></div>
+      <h2 id="rsvp-modal-title">Undangan</h2>
+      <p class="rsvp-deadline">Sahkan kehadiran sebelum <strong>1 September 2026</strong></p>
     </div>
 
-    <p class="rsvp-deadline reveal reveal-delay-1">
-      Sahkan kehadiran seebelum <strong>1 September 2026</strong>
-    </p>
-
-    <div class="rsvp-form-wrapper reveal reveal-delay-2">
-      <form id="rsvp-form" class="rsvp-form" novalidate aria-label="RSVP form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="rsvp-name">Nama Penuh <span aria-label="required">*</span></label>
-            <input
-              type="text"
-              id="rsvp-name"
-              name="name"
-              placeholder="Ali bin Abu"
-              required
-              autocomplete="name"
-              minlength="2"
-              maxlength="80"
-            />
-            <span class="form-error" id="rsvp-name-err" role="alert"></span>
-          </div>
-          <div class="form-group">
-            <label for="rsvp-phone">Nombor Telefon</label>
-            <input
-              type="text"
-              id="rsvp-phone"
-              name="phone"
-              placeholder="01X-XXXXXXXX"
-              autocomplete="tel"
-              maxlength="20"
-            />
-          </div>
-        </div>
-
+    <form id="rsvp-form" class="rsvp-form" novalidate aria-label="RSVP form">
+      <div class="form-row">
         <div class="form-group">
-          <label>Kehadiran <span aria-label="required">*</span></label>
-          <div class="rsvp-attendance" role="radiogroup" aria-required="true">
-            <label class="rsvp-radio-label" for="att-yes">
-              <input type="radio" id="att-yes" name="attendance" value="yes" required />
-              <span class="radio-custom" aria-hidden="true"></span>
-              <span>
-                <strong>Dengan sukacitanya</strong>
-                <em>Saya akan hadir!</em>
-              </span>
-            </label>
-            <label class="rsvp-radio-label" for="att-no">
-              <input type="radio" id="att-no" name="attendance" value="no" required />
-              <span class="radio-custom" aria-hidden="true"></span>
-              <span>
-                <strong>Dengan dukacitanya</strong>
-                <em>Tidak dapat hadir</em>
-              </span>
-            </label>
-          </div>
-          <span class="form-error" id="rsvp-att-err" role="alert"></span>
-        </div>
-
-        <div class="form-group" id="guest-count-group">
-          <label for="rsvp-guests">Bilangan tetamu (including yourself)</label>
-          <select id="rsvp-guests" name="guests">
-            <option value="1">1 Orang</option>
-            <option value="2">2 Orang</option>
-            <option value="3">3 Orang</option>
-            <option value="4">4 Orang</option>
-            <option value="5+">5+ Orang</option>
-          </select>
-        </div>
-
-        <!--
-        <div class="form-group">
-          <label for="rsvp-events">Events Attending</label>
-          <div class="rsvp-checkboxes">
-            <label class="rsvp-check-label" for="ev-ceremony">
-              <input type="checkbox" id="ev-ceremony" name="events" value="ceremony" checked />
-              <span class="check-custom" aria-hidden="true"></span>
-              Holy Matrimony (10:00 AM)
-            </label>
-            <label class="rsvp-check-label" for="ev-reception">
-              <input type="checkbox" id="ev-reception" name="events" value="reception" checked />
-              <span class="check-custom" aria-hidden="true"></span>
-              Wedding Reception (2:00 PM)
-            </label>
-            <label class="rsvp-check-label" for="ev-party">
-              <input type="checkbox" id="ev-party" name="events" value="afterparty" />
-              <span class="check-custom" aria-hidden="true"></span>
-              After Party (10:00 PM)
-            </label>
-          </div>
-        </div>
-      -->
-        <div class="form-group" id="dietary-group">
-          <label for="rsvp-dietary">Makanan Alergik</label>
+          <label for="rsvp-name">Nama Penuh <span aria-label="required">*</span></label>
           <input
             type="text"
-            id="rsvp-dietary"
-            name="dietary"
-            placeholder="Vegetarian, vegan, allergies, etc. (optional)"
-            maxlength="200"
+            id="rsvp-name"
+            name="name"
+            placeholder="Ali bin Abu"
+            required
+            autocomplete="name"
+            minlength="2"
+            maxlength="80"
+          />
+          <span class="form-error" id="rsvp-name-err" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="rsvp-phone">Nombor Telefon</label>
+          <input
+            type="text"
+            id="rsvp-phone"
+            name="phone"
+            placeholder="01X-XXXXXXXX"
+            autocomplete="tel"
+            maxlength="20"
           />
         </div>
-
-        <div class="form-group" id="message-group">
-          <label for="rsvp-message">Nota</label>
-          <textarea
-            id="rsvp-message"
-            name="message"
-            rows="4"
-            placeholder="Nota tambahan... (optional)"
-            maxlength="500"
-          ></textarea>
-          <span class="char-count" id="rsvp-msg-count">0 / 500</span>
-        </div>
-
-        <button type="submit" class="btn btn-primary rsvp-submit" id="rsvp-submit-btn">
-          <span class="btn-text">Hantar RSVP Saya</span>
-          <span class="btn-loading hidden" aria-hidden="true">Menghantar…</span>
-        </button>
-      </form>
-
-      <!-- Success Message -->
-      <div class="rsvp-success hidden" id="rsvp-success" role="status" aria-live="polite">
-        <div class="rsvp-success-icon" aria-hidden="true">💌</div>
-        <h3>Thank You!</h3>
-        <p id="rsvp-success-msg">We've received your RSVP and can't wait to celebrate with you!</p>
-        <button class="btn btn-outline rsvp-reset-btn" id="rsvp-reset-btn" type="button">Submit Another RSVP</button>
       </div>
 
-    </div><!-- /.rsvp-form-wrapper -->
+      <div class="form-group">
+        <label>Kehadiran <span aria-label="required">*</span></label>
+        <div class="rsvp-attendance" role="radiogroup" aria-required="true">
+          <label class="rsvp-radio-label" for="att-yes">
+            <input type="radio" id="att-yes" name="attendance" value="yes" required />
+            <span class="radio-custom" aria-hidden="true"></span>
+            <span>
+              <strong>Dengan sukacitanya</strong>
+              <em>Saya akan hadir!</em>
+            </span>
+          </label>
+          <label class="rsvp-radio-label" for="att-no">
+            <input type="radio" id="att-no" name="attendance" value="no" required />
+            <span class="radio-custom" aria-hidden="true"></span>
+            <span>
+              <strong>Dengan dukacitanya</strong>
+              <em>Tidak dapat hadir</em>
+            </span>
+          </label>
+        </div>
+        <span class="form-error" id="rsvp-att-err" role="alert"></span>
+      </div>
+
+      <div class="form-group" id="guest-count-group">
+        <label for="rsvp-guests">Bilangan tetamu (termasuk diri sendiri)</label>
+        <select id="rsvp-guests" name="guests">
+          <option value="1">1 Orang</option>
+          <option value="2">2 Orang</option>
+          <option value="3">3 Orang</option>
+          <option value="4">4 Orang</option>
+          <option value="5+">5+ Orang</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="dietary-group">
+        <label for="rsvp-dietary">Makanan Alergik</label>
+        <input
+          type="text"
+          id="rsvp-dietary"
+          name="dietary"
+          placeholder="Vegetarian, vegan, alahan, dll. (optional)"
+          maxlength="200"
+        />
+      </div>
+
+      <div class="form-group" id="message-group">
+        <label for="rsvp-message">Nota</label>
+        <textarea
+          id="rsvp-message"
+          name="message"
+          rows="3"
+          placeholder="Nota tambahan... (optional)"
+          maxlength="500"
+        ></textarea>
+        <span class="char-count" id="rsvp-msg-count">0 / 500</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary rsvp-submit" id="rsvp-submit-btn">
+        <span class="btn-text">Hantar RSVP Saya</span>
+        <span class="btn-loading hidden" aria-hidden="true">Menghantar…</span>
+      </button>
+    </form>
+
+    <!-- Success Message -->
+    <div class="rsvp-success hidden" id="rsvp-success" role="status" aria-live="polite">
+      <div class="rsvp-success-icon" aria-hidden="true">💌</div>
+      <h3>Terima Kasih!</h3>
+      <p id="rsvp-success-msg">Kami telah menerima RSVP anda!</p>
+      <button class="btn btn-outline rsvp-reset-btn" id="rsvp-reset-btn" type="button">Hantar RSVP Lain</button>
+    </div>
   </div>
-</section>
+</div>

@@ -193,6 +193,34 @@ async function loadAllComponents(app) {
   }
 }
 
+// ─── RSVP modal open/close ────────────────────────────────────────────────────
+function initRSVPModal() {
+  const modal    = document.getElementById('rsvp-modal');
+  const openBtn  = document.getElementById('event-rsvp-open-btn');
+  const closeBtn = document.getElementById('rsvp-modal-close');
+  const backdrop = document.getElementById('rsvp-modal-backdrop');
+
+  if (!modal) return;
+
+  function openModal() {
+    modal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+    closeBtn?.focus();
+  }
+  function closeModal() {
+    modal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+    openBtn?.focus();
+  }
+
+  openBtn?.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+  closeBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (!modal.hasAttribute('hidden') && e.key === 'Escape') closeModal();
+  });
+}
+
 // ─── RSVP form ───────────────────────────────────────────────────────────────
 function initRSVP() {
   const form       = document.getElementById('rsvp-form');
@@ -301,6 +329,12 @@ function initRSVP() {
       ? `Kami telah menerima RSVP anda dan tidak sabar untuk meraikan bersama anda, ${nameVal}!`
       : `Kami kesal anda tidak dapat hadir, ${nameVal}. Anda tetap dalam hati kami!`;
     if (successMsg) successMsg.textContent = message;
+
+    // Auto-close modal after 3s on success
+    setTimeout(() => {
+      const modal = document.getElementById('rsvp-modal');
+      if (modal) { modal.setAttribute('hidden', ''); document.body.style.overflow = ''; }
+    }, 3000);
   });
 
   resetBtn?.addEventListener('click', () => {
@@ -338,7 +372,7 @@ function initFooterYear() {
 
 // ─── Nav highlight on scroll ─────────────────────────────────────────────────
 function initActiveNav() {
-  const sections = ['hero','event','countdown','gallery','location','rsvp','guestbook'];
+  const sections = ['hero','event','countdown','gallery','location','guestbook'];
   const links    = document.querySelectorAll('.footer-nav a');
 
   const observer = new IntersectionObserver((entries) => {
@@ -382,6 +416,7 @@ function hideLoadingScreen() {
     initCountdown();
     initGallery();
     initGuestbook();
+    initRSVPModal();
     initRSVP();
     initBackToTop();
     initFooterYear();
